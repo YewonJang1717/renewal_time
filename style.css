@@ -1,0 +1,121 @@
+@font-face {
+  font-family: "Pretendard Variable";
+  font-style: normal;
+  font-weight: 45 930;
+  font-display: swap;
+  src: url("font/PretendardVariable.woff2") format("woff2-variations");
+}
+
+@font-face {
+  font-family: "dunkel-sans-semicond-rounded";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("font/dunkel-sans-semicond-rounded.woff2") format("woff2");
+}
+
+html {
+  hanging-punctuation: first last;
+  hyphens: none;
+}
+
+body {
+  font:
+    100%/1.5 "Pretendard Variable",
+    sans-serif;
+  padding: 0;
+  margin: 2em;
+  text-align: left;
+  font-weight: 400;
+  color: #37073e;
+  background: #82b2ff;
+  word-break: keep-all;
+}
+
+img {
+  width: 100%;
+  vertical-align: middle;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+header {
+  text-align: left;
+}
+p {
+  text-wrap: pretty;
+}
+
+/* title ----------------------------------------------- */
+h1 {
+  font-family: "dunkel-sans-semicond-rounded", sans-serif;
+  font-weight: 400;
+  line-height: 1.05;
+  padding: 0;
+  margin: 0;
+  color:rgb(212, 20, 154)
+}
+
+.title {
+  display: block;
+  font-size: 9vw;
+}
+
+h2 {
+  font-weight: 400;
+  font-family: "dunkel-sans-semicond-rounded", sans-serif;
+  font-size: 6vw;
+  line-height: 1.2;
+  padding: 0;
+  margin: 0;
+  color: rgb(212, 20, 154);
+}
+
+/* Grid ----------------------------------------------- */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 1em;
+  margin-top: 6em;
+}
+
+.grid h3,
+.grid p {
+  margin: 0;
+}
+
+.grid h3 {
+  font-weight: 400;
+  font-family: "Pretendard Variable", sans-serif;
+  font-size: 1.5em;
+  line-height: 1.5;
+}
+
+.grid img {
+  margin-bottom: 2em;
+}
+
+@media only screen and (min-width: 60em) {
+  .grid {
+    grid-template-columns: 1fr 1fr 2fr;
+  }
+}
+
+footer {
+  font-size: 0.9em;
+  color: #291aff;
+  padding: 2em 1em;
+  text-align: left;
+}
+
+a {
+  color: #2e2e2e;
+}
