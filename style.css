@@ -7,11 +7,17 @@
 }
 
 @font-face {
-  font-family: "dunkel-sans-semicond-rounded";
+  font-family: "agchoijeongho-screen";
+  font-weight: 400;
+font-style: normal;
+  src: url("font/agchoijeongho-screen.woff2") format("woff2"  );
+}
+
+@font-face {
+  font-family: "rixrak-serif-pro";
+  font-weight: 700;
   font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src: url("font/dunkel-sans-semicond-rounded.woff2") format("woff2");
+  src: url("font/rixrak-serif-pro.woff2") format("woff2");
 }
 
 html {
@@ -21,14 +27,14 @@ html {
 
 body {
   font:
-    100%/1.5 "Pretendard Variable",
+    100%/1.5 "agchoijeongho-screen",
     sans-serif;
   padding: 0;
   margin: 2em;
   text-align: left;
   font-weight: 400;
-  color: #37073e;
-  background: #82b2ff;
+  color: #F0F2F5;
+  background: #2C2C2C;
   word-break: keep-all;
 }
 
@@ -56,12 +62,13 @@ p {
 
 /* title ----------------------------------------------- */
 h1 {
-  font-family: "dunkel-sans-semicond-rounded", sans-serif;
+  font-family: "rixrak-serif-pro", sans-serif;
   font-weight: 400;
   line-height: 1.05;
   padding: 0;
   margin: 0;
-  color:rgb(212, 20, 154)
+  color: rgb(148, 205, 255);
+  text-align: center; 
 }
 
 .title {
@@ -71,12 +78,13 @@ h1 {
 
 h2 {
   font-weight: 400;
-  font-family: "dunkel-sans-semicond-rounded", sans-serif;
+  font-family: "rixrak-serif-pro", sans-serif;
   font-size: 6vw;
   line-height: 1.2;
   padding: 0;
   margin: 0;
-  color: rgb(212, 20, 154);
+  color: rgb(148, 205, 255);
+  text-align: center;
 }
 
 /* Grid ----------------------------------------------- */
@@ -94,7 +102,7 @@ h2 {
 
 .grid h3 {
   font-weight: 400;
-  font-family: "Pretendard Variable", sans-serif;
+  font-family: "rixrak-serif-pro", sans-serif;
   font-size: 1.5em;
   line-height: 1.5;
 }
@@ -111,11 +119,11 @@ h2 {
 
 footer {
   font-size: 0.9em;
-  color: #291aff;
+  color: #F0F2F5;
   padding: 2em 1em;
   text-align: left;
 }
 
 a {
-  color: #2e2e2e;
+  color: rgb(148, 205, 255);
 }
