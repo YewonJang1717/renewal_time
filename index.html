@@ -39,6 +39,7 @@
   <!-- 체험 화면 -->
   <div id="screen-experience" class="screen">
     <button class="hamburger-btn" data-menu-toggle><span></span><span></span><span></span></button>
+    <div class="intro-hint" id="intro-hint">왼쪽 패널의 글을 자유롭게 수정하세요.</div>
 
     <!-- 왼쪽: 편집 가능한 원본 -->
     <div class="wiki-panel" id="panel-left">
@@ -48,7 +49,13 @@
         <div class="wiki-header-right">
           <div class="wiki-meta" id="left-meta">최종 수정 시각 : —</div>
           <button class="edit-btn" id="add-table-btn" style="display:none;">+ 표 추가</button>
-          <span class="wiki-meta" id="heading-hint" style="display:none;">대분류: =내용=  ·  하위항목: -내용-</span>
+          <div class="help-wrap" style="display:none;" id="help-wrap">
+            <button class="edit-btn help-btn" id="help-btn">?</button>
+            <div class="help-popover" id="help-popover">
+              <p><strong>대분류</strong>: <code>=내용=</code> → 1, 2, 3 ...</p>
+              <p><strong>하위항목</strong>: <code>-내용-</code> → 1.1, 1.2 ...</p>
+            </div>
+          </div>
           <button class="edit-btn" id="edit-toggle-btn">편집</button>
         </div>
       </div>

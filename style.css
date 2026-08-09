@@ -9,20 +9,20 @@
   --added-bg: #d3e8da;
 }
 
-* { box-sizing: border-box; }
-
-
 body {
-  font-family:'sandoll-gothicneo1', sans-serif;
+  font-family: 'sandoll-gothicneo1', 'sans-serif';
   font-weight: 100;
   font-style: normal;
 }
+
+* { box-sizing: border-box; }
+
 html, body {
   margin: 0;
   height: 100%;
   background: var(--bg);
   color: var(--light-text);
-  font-family: 'sandoll-gothicneo1', sans-serif;
+  font-family: 'sandoll-gothicneo1', 'sans-serif';
   font-weight: 100;
   font-style: normal;
   overflow: hidden;
@@ -69,7 +69,7 @@ html, body {
   border: none;
   color: var(--light-muted);
   font-size: 18px;
-  font-family: 'sandoll-gothicneo1', sans-serif;
+  font-family: 'sandoll-gothicneo1', 'sans-serif';
   cursor: pointer;
   padding: 4px 8px;
   transition: color 0.2s ease;
@@ -100,7 +100,7 @@ html, body {
   position: absolute;
   top: 78px;
   left: 32px;
-  background: #2c2c2c;
+  background: #1c1c1c;
   border: 1px solid #3a3a3a;
   border-radius: 8px;
   padding: 8px 0;
@@ -122,7 +122,7 @@ html, body {
   background: none;
   border: none;
   color: var(--light-text);
-  font-family: 'sandoll-gothicneo1', sans-serif;
+  font-family: 'sandoll-gothicneo1', 'sans-serif';
   font-size: 15px;
   text-align: left;
   padding: 10px 18px;
@@ -210,7 +210,7 @@ html, body {
   color: var(--panel-muted);
 }
 .edit-btn {
-  font-family: 'sandoll-gothicneo1', sans-serif;
+  font-family: 'sandoll-gothicneo1', 'sans-serif';
   font-size: 12px;
   border: 1px solid #b8bac0;
   background: #ffffff;
@@ -268,17 +268,73 @@ html, body {
 .diff-added { background: var(--added-bg); }
 
 .table-block { position: relative; }
-.table-remove-btn {
+.table-remove-btn, .row-add-btn {
   display: none;
-  font-family: 'sandoll-gothicneo1', sans-serif;
+  font-family: 'sandoll-gothicneo1', 'sans-serif';
   font-size: 11px;
   color: #b23b3b;
   background: none;
   border: none;
   cursor: pointer;
   padding: 0 0 6px 0;
+  margin-right: 10px;
 }
-.is-editing .table-remove-btn { display: inline-block; }
+.row-add-btn { color: #2c6e49; }
+.is-editing .table-remove-btn, .is-editing .row-add-btn { display: inline-block; }
+
+.row-controls { display: none; border: none !important; padding: 0 6px !important; width: 24px; }
+.is-editing .row-controls { display: table-cell; }
+.row-remove-btn {
+  font-family: 'sandoll-gothicneo1', 'sans-serif';
+  font-size: 11px;
+  color: #b23b3b;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* 편집 안내 팝오버 */
+.help-wrap { position: relative; }
+.help-btn { padding: 4px 10px; border-radius: 50%; }
+.help-popover {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  background: #2c2c2c;
+  color: #f0f2f5;
+  border-radius: 8px;
+  padding: 12px 14px;
+  width: 220px;
+  font-size: 12px;
+  line-height: 1.7;
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 30;
+}
+.help-popover.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.help-popover p { margin: 0 0 6px 0; }
+.help-popover p:last-child { margin-bottom: 0; }
+.help-popover code { background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; }
+
+/* 체험 화면 첫 안내 배너 */
+.intro-hint {
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: #f0f2f5;
+  color: #2c2c2c;
+  font-size: 13px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 25;
+}
+.intro-hint.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* 오른쪽 패널: 기본은 배경색과 완전히 같은 색이라 안 보이지만, 자리는 그대로 차지함 */
 .sentence {

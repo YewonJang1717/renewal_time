@@ -9,6 +9,12 @@ function goTo(name) {
   Object.values(screens).forEach(s => s.classList.remove('active'));
   screens[name].classList.add('active');
   closeAllMenus();
+  if (name === 'experience') {
+    const hint = document.getElementById('intro-hint');
+    hint.classList.add('show');
+    clearTimeout(goTo._hintTimer);
+    goTo._hintTimer = setTimeout(() => hint.classList.remove('show'), 4000);
+  }
 }
 
 document.querySelectorAll('[data-nav]').forEach(btn => {
@@ -102,6 +108,9 @@ function setActivePanel(activePanel) {
 panelLeft.addEventListener('mouseenter', () => setActivePanel(panelLeft));
 panelRight.addEventListener('mouseenter', () => setActivePanel(panelRight));
 experienceStage.addEventListener('mouseleave', () => setActivePanel(null));
+panelLeft.addEventListener('click', () => {
+  document.getElementById('intro-hint').classList.remove('show');
+});
 
 // ==========================================================================
 // 체험 화면: 자유 항목(==제목== 형식) + 표 추가/삭제 + 위치 고정 5문장 로그
@@ -203,37 +212,60 @@ function renumberHeadings(containerEl) {
   });
 }
 
-// 표에 삭제 버튼(편집 중에만 보임) 부착
+// 행에 삭제 버튼(세 번째 칸, 편집 중에만 보임) 부착
+function ensureRowControls(table) {
+  table.querySelectorAll('tr').forEach(tr => {
+    if (tr.querySelector('.row-controls')) return;
+    const td = document.createElement('td');
+    td.className = 'row-controls';
+    const btn = document.createElement('button');
+    btn.className = 'row-remove-btn';
+    btn.textContent = '✕';
+    btn.addEventListener('click', () => { tr.remove(); });
+    td.appendChild(btn);
+    tr.appendChild(td);
+  });
+}
+
+// 표에 삭제 버튼(편집 중에만 보임) 부착 + 행 추가 버튼 + 행별 삭제 컨트롤
 function ensureTableRemoveButton(table) {
+  ensureRowControls(table);
   if (table.parentElement && table.parentElement.classList.contains('table-block')) return;
   const wrap = document.createElement('div');
   wrap.className = 'table-block';
   table.parentNode.insertBefore(wrap, table);
   wrap.appendChild(table);
+
   const removeBtn = document.createElement('button');
   removeBtn.className = 'table-remove-btn';
   removeBtn.textContent = '✕ 표 삭제';
   removeBtn.addEventListener('click', () => { wrap.remove(); });
+
+  const addRowBtn = document.createElement('button');
+  addRowBtn.className = 'row-add-btn';
+  addRowBtn.textContent = '+ 행 추가';
+  addRowBtn.addEventListener('click', () => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="label" contenteditable="true">항목</td><td contenteditable="true"></td>`;
+    table.appendChild(tr);
+    ensureRowControls(table);
+    tr.querySelector('td').focus();
+  });
+
+  wrap.insertBefore(addRowBtn, table);
   wrap.insertBefore(removeBtn, table);
 }
 leftBody.querySelectorAll('table.wiki-table').forEach(ensureTableRemoveButton);
 
 addTableBtn.addEventListener('click', () => {
-  const wrap = document.createElement('div');
-  wrap.className = 'table-block';
   const table = document.createElement('table');
   table.className = 'wiki-table';
   table.innerHTML = `
-    <tr><td class="label" contenteditable="true">항목</td><td contenteditable="true" data-cell="new"></td></tr>
-    <tr><td class="label" contenteditable="true">항목</td><td contenteditable="true" data-cell="new"></td></tr>
+    <tr><td class="label" contenteditable="true">항목</td><td contenteditable="true"></td></tr>
+    <tr><td class="label" contenteditable="true">항목</td><td contenteditable="true"></td></tr>
   `;
-  const removeBtn = document.createElement('button');
-  removeBtn.className = 'table-remove-btn';
-  removeBtn.textContent = '✕ 표 삭제';
-  removeBtn.addEventListener('click', () => { wrap.remove(); });
-  wrap.appendChild(removeBtn);
-  wrap.appendChild(table);
-  leftBody.appendChild(wrap);
+  leftBody.appendChild(table);
+  ensureTableRemoveButton(table);
   table.querySelector('td').focus();
 });
 
@@ -312,6 +344,17 @@ function evictIfNeeded() {
   }
 }
 
+const helpWrap = document.getElementById('help-wrap');
+const helpBtn = document.getElementById('help-btn');
+const helpPopover = document.getElementById('help-popover');
+helpBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  helpPopover.classList.toggle('open');
+});
+document.addEventListener('click', (e) => {
+  if (!helpWrap.contains(e.target)) helpPopover.classList.remove('open');
+});
+
 editBtn.addEventListener('click', () => {
   if (!isEditing) {
     // 편집 시작
@@ -320,10 +363,10 @@ editBtn.addEventListener('click', () => {
     editBtn.textContent = '완료';
     editBtn.classList.add('done');
     addTableBtn.style.display = 'inline-block';
-    document.getElementById('heading-hint').style.display = 'inline';
+    document.getElementById('help-wrap').style.display = 'inline-block';
     leftTitle.setAttribute('contenteditable', 'true');
     leftBody.querySelectorAll('p, .heading-text').forEach(el => el.setAttribute('contenteditable', 'true'));
-    leftBody.querySelectorAll('td').forEach(td => td.setAttribute('contenteditable', 'true'));
+    leftBody.querySelectorAll('td:not(.row-controls)').forEach(td => td.setAttribute('contenteditable', 'true'));
     leftBody.setAttribute('contenteditable', 'true'); // 새 문단(Enter)이나 맨 끝 추가 입력 허용
     previousBlocks = extractBlocks(leftBody);
     leftTitle.focus();
@@ -334,11 +377,12 @@ editBtn.addEventListener('click', () => {
     editBtn.textContent = '편집';
     editBtn.classList.remove('done');
     addTableBtn.style.display = 'none';
-    document.getElementById('heading-hint').style.display = 'none';
+    document.getElementById('help-wrap').style.display = 'none';
+    helpPopover.classList.remove('open');
     leftTitle.removeAttribute('contenteditable');
     leftBody.removeAttribute('contenteditable');
     leftBody.querySelectorAll('p, .heading-text').forEach(el => el.removeAttribute('contenteditable'));
-    leftBody.querySelectorAll('td').forEach(td => td.removeAttribute('contenteditable'));
+    leftBody.querySelectorAll('td:not(.row-controls)').forEach(td => td.removeAttribute('contenteditable'));
 
     convertPendingHeadings(leftBody);
     renumberHeadings(leftBody);
