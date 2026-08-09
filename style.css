@@ -9,10 +9,11 @@
   --added-bg: #d3e8da;
 }
 body {
-  font-family: 'sandoll-gothicneo1, sans-serif; ', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'sandoll-gothicneo1', sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 300;
   font-style: normal;
 }
+
 
 * { box-sizing: border-box; }
 
@@ -21,7 +22,7 @@ html, body {
   height: 100%;
   background: var(--bg);
   color: var(--light-text);
-  font-family: 'sandoll-gothicneo1, sans-serif;', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'sandoll-gothicneo1', sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
   overflow: hidden;
 }
 
@@ -207,7 +208,7 @@ html, body {
   color: var(--panel-muted);
 }
 .edit-btn {
-  font-family: 'sandoll-gothicneo1, sans-serif; ';
+  font-family: 'sandoll-gothicneo1', sans-serif;
   font-size: 12px;
   border: 1px solid #b8bac0;
   background: #ffffff;
@@ -219,7 +220,7 @@ html, body {
 .edit-btn:hover { background: #e6e8ec; }
 .edit-btn.done { background: #2c2c2c; color: #f0f2f5; border-color: #2c2c2c; }
 
-.wiki-body { font-size: 14px; line-height: 1.9; outline: none; }
+.wiki-body { font-size: 14px; line-height: 1.9; outline: none; font-weight: 300; }
 .wiki-body[contenteditable="true"] { background: rgba(0,0,0,0.02); }
 .wiki-body p { margin: 0 0 16px 0; }
 
