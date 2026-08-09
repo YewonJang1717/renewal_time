@@ -9,7 +9,7 @@
   --added-bg: #d3e8da;
 }
 body {
-  font-family: sandoll-gothicneo1, sans-serif;
+  font-family: 'sandoll-gothicneo1, sans-serif; ', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 300;
   font-style: normal;
 }
@@ -207,7 +207,7 @@ html, body {
   color: var(--panel-muted);
 }
 .edit-btn {
-  font-family: inherit;
+  font-family: 'sandoll-gothicneo1, sans-serif; ';
   font-size: 12px;
   border: 1px solid #b8bac0;
   background: #ffffff;
