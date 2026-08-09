@@ -103,53 +103,36 @@ panelLeft.addEventListener('mouseenter', () => setActivePanel(panelLeft));
 panelRight.addEventListener('mouseenter', () => setActivePanel(panelRight));
 experienceStage.addEventListener('mouseleave', () => setActivePanel(null));
 
-// ---------- 체험 화면: 편집 모드 + 오른쪽 = 왼쪽과 동일한 구조의 거울 ----------
+// ==========================================================================
+// 체험 화면: 자유 항목(==제목== 형식) + 표 추가/삭제 + 위치 고정 5문장 로그
+// ==========================================================================
 const leftTitle = document.getElementById('left-title');
 const leftBody = document.getElementById('left-body');
 const leftMeta = document.getElementById('left-meta');
 const editBtn = document.getElementById('edit-toggle-btn');
+const addTableBtn = document.getElementById('add-table-btn');
 const rightTitle = document.getElementById('right-title');
 const rightVersion = document.getElementById('right-version');
 const rightBody = document.getElementById('right-body');
-const leftTable = document.getElementById('left-table');
-const rightTable = document.getElementById('right-table');
-const flashLeft = document.getElementById('flash-left');
-const flashRight = document.getElementById('flash-right');
 
 let isEditing = false;
 let version = 1.0;
 let touchCounter = 0;
 
-// key = "p3-1" (3번째 문단의 2번째 문장) -> { text, lastTouched }
+// key = "b3-1" (블록 b3의 2번째 문장) -> { text, lastTouched }
 const revealedMap = new Map();
+
+// 블록(문단/소제목/표) 하나하나에 안정적인 id를 부여 — DOM 노드가 같으면 id도 유지됨
+const blockIdMap = new WeakMap();
+let blockIdCounter = 0;
+function getBlockId(node) {
+  if (!blockIdMap.has(node)) blockIdMap.set(node, 'b' + (blockIdCounter++));
+  return blockIdMap.get(node);
+}
 
 function splitSentences(text) {
   return text.trim().split(/(?<=[.?!])\s+/).filter(s => s.trim().length > 0);
 }
-
-// 왼쪽 각 문단의 "현재 문장 배열"을 저장해둠 (편집 시작 시 스냅샷으로도 사용)
-let paragraphState = {}; // { "0": [문장, 문장...], "1": [...], ... }
-
-function captureParagraphState() {
-  const state = {};
-  leftBody.querySelectorAll('p[data-p]').forEach(p => {
-    state[p.dataset.p] = splitSentences(p.textContent);
-  });
-  return state;
-}
-paragraphState = captureParagraphState();
-
-// 오른쪽 본문의 각 <p>에 왼쪽과 동일한 개수의 <span class="sentence hidden">를 채워 넣는다.
-function initRightParagraphs() {
-  rightBody.querySelectorAll('p[data-p]').forEach(p => {
-    const pIndex = p.dataset.p;
-    const sentences = paragraphState[pIndex] || [];
-    p.innerHTML = sentences.map((s, i) =>
-      `<span class="sentence hidden" data-p="${pIndex}" data-s="${i}">${s}</span>`
-    ).join(' ');
-  });
-}
-initRightParagraphs();
 
 function formatTimestamp(d) {
   const pad = n => String(n).padStart(2, '0');
@@ -171,7 +154,6 @@ function simpleWordDiff(oldText, newText) {
   };
 }
 
-// 새로고침처럼 두 번 깜빡이는, 이전보다 뚜렷한 플래시
 function refreshFlash(el) {
   el.style.opacity = '1';
   setTimeout(() => { el.style.opacity = '0'; }, 90);
@@ -179,17 +161,154 @@ function refreshFlash(el) {
   setTimeout(() => { el.style.opacity = '0'; }, 270);
 }
 
+// 헤딩 요소 생성 (번호 부분은 별도 span으로, 실제 편집 대상은 .heading-text만)
+function makeHeadingDiv(rawText, level) {
+  const div = document.createElement('div');
+  div.className = 'wiki-subheading wiki-subheading' + level;
+  const num = document.createElement('span');
+  num.className = 'heading-num';
+  const textSpan = document.createElement('span');
+  textSpan.className = 'heading-text';
+  textSpan.textContent = rawText;
+  div.appendChild(num);
+  div.appendChild(document.createTextNode(' '));
+  div.appendChild(textSpan);
+  return div;
+}
+
+// "=내용=" -> 1단계 항목(1. 2. 3. ...), "-내용-" -> 2단계 항목(1.1, 1.2 ...)으로 변환
+function convertPendingHeadings(bodyEl) {
+  Array.from(bodyEl.querySelectorAll('p')).forEach(p => {
+    const text = p.textContent.trim();
+    let m = text.match(/^-\s*(.+?)\s*-$/);
+    if (m) { p.replaceWith(makeHeadingDiv(m[1], 2)); return; }
+    m = text.match(/^=\s*(.+?)\s*=$/);
+    if (m) { p.replaceWith(makeHeadingDiv(m[1], 1)); return; }
+  });
+}
+
+// 문서 순서대로 훑으며 1단계/2단계 번호를 새로 매김
+function renumberHeadings(containerEl) {
+  let topCount = 0, subCount = 0;
+  Array.from(containerEl.children).forEach(el => {
+    if (!el.classList || !el.classList.contains('wiki-subheading')) return;
+    const numEl = el.querySelector('.heading-num');
+    if (el.classList.contains('wiki-subheading1')) {
+      topCount++; subCount = 0;
+      if (numEl) numEl.textContent = topCount + '.';
+    } else if (el.classList.contains('wiki-subheading2')) {
+      subCount++;
+      if (numEl) numEl.textContent = topCount + '.' + subCount;
+    }
+  });
+}
+
+// 표에 삭제 버튼(편집 중에만 보임) 부착
+function ensureTableRemoveButton(table) {
+  if (table.parentElement && table.parentElement.classList.contains('table-block')) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'table-block';
+  table.parentNode.insertBefore(wrap, table);
+  wrap.appendChild(table);
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'table-remove-btn';
+  removeBtn.textContent = '✕ 표 삭제';
+  removeBtn.addEventListener('click', () => { wrap.remove(); });
+  wrap.insertBefore(removeBtn, table);
+}
+leftBody.querySelectorAll('table.wiki-table').forEach(ensureTableRemoveButton);
+
+addTableBtn.addEventListener('click', () => {
+  const wrap = document.createElement('div');
+  wrap.className = 'table-block';
+  const table = document.createElement('table');
+  table.className = 'wiki-table';
+  table.innerHTML = `
+    <tr><td class="label" contenteditable="true">항목</td><td contenteditable="true" data-cell="new"></td></tr>
+    <tr><td class="label" contenteditable="true">항목</td><td contenteditable="true" data-cell="new"></td></tr>
+  `;
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'table-remove-btn';
+  removeBtn.textContent = '✕ 표 삭제';
+  removeBtn.addEventListener('click', () => { wrap.remove(); });
+  wrap.appendChild(removeBtn);
+  wrap.appendChild(table);
+  leftBody.appendChild(wrap);
+  table.querySelector('td').focus();
+});
+
+// 왼쪽 body를 순서대로 훑어 블록 리스트로 추출 (문단/소제목/표)
+function extractBlocks(bodyEl) {
+  const blocks = [];
+  Array.from(bodyEl.children).forEach(el => {
+    if (el.classList && el.classList.contains('wiki-subheading1')) {
+      const textEl = el.querySelector('.heading-text');
+      blocks.push({ id: getBlockId(el), type: 'heading1', text: (textEl || el).textContent.trim() });
+    } else if (el.classList && el.classList.contains('wiki-subheading2')) {
+      const textEl = el.querySelector('.heading-text');
+      blocks.push({ id: getBlockId(el), type: 'heading2', text: (textEl || el).textContent.trim() });
+    } else if (el.tagName === 'P') {
+      const text = el.textContent.trim();
+      if (text) blocks.push({ id: getBlockId(el), type: 'paragraph', sentences: splitSentences(text) });
+    } else if (el.classList && el.classList.contains('table-block')) {
+      const table = el.querySelector('table');
+      if (!table) return;
+      const rows = Array.from(table.querySelectorAll('tr')).map(tr => {
+        const tds = Array.from(tr.querySelectorAll('td'));
+        return { label: tds[0] ? tds[0].textContent.trim() : '', value: tds[1] ? tds[1].textContent.trim() : '' };
+      });
+      blocks.push({ id: getBlockId(el), type: 'table', rows });
+    }
+  });
+  return blocks;
+}
+
+let previousBlocks = extractBlocks(leftBody);
+
+// 오른쪽 패널을 blocks 데이터로부터 통째로 다시 그림
+function renderRightBody(blocks) {
+  rightBody.innerHTML = '';
+  blocks.forEach(block => {
+    if (block.type === 'heading1' || block.type === 'heading2') {
+      rightBody.appendChild(makeHeadingDiv(block.text, block.type === 'heading1' ? 1 : 2));
+    } else if (block.type === 'paragraph') {
+      const p = document.createElement('p');
+      block.sentences.forEach((s, i) => {
+        const key = block.id + '-' + i;
+        const span = document.createElement('span');
+        span.className = 'sentence' + (revealedMap.has(key) ? '' : ' hidden');
+        span.dataset.key = key;
+        span.textContent = s;
+        p.appendChild(span);
+        p.appendChild(document.createTextNode(' '));
+      });
+      rightBody.appendChild(p);
+    } else if (block.type === 'table') {
+      const wrap = document.createElement('div');
+      wrap.className = 'table-block';
+      const table = document.createElement('table');
+      table.className = 'wiki-table';
+      block.rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="label">${row.label}</td><td>${row.value}</td>`;
+        table.appendChild(tr);
+      });
+      wrap.appendChild(table);
+      rightBody.appendChild(wrap);
+    }
+  });
+  renumberHeadings(rightBody);
+}
+renderRightBody(previousBlocks); // 초기 상태 렌더
+renumberHeadings(leftBody); // 왼쪽 초기 번호 매기기
+
 function evictIfNeeded() {
   while (revealedMap.size > 5) {
     let oldestKey = null, oldestTouch = Infinity;
     revealedMap.forEach((entry, key) => {
       if (entry.lastTouched < oldestTouch) { oldestTouch = entry.lastTouched; oldestKey = key; }
     });
-    if (oldestKey !== null) {
-      revealedMap.delete(oldestKey);
-      const span = rightBody.querySelector(`.sentence[data-p="${oldestKey.split('-')[0]}"][data-s="${oldestKey.split('-')[1]}"]`);
-      if (span) { span.classList.add('hidden'); span.classList.remove('diff-removed','diff-added'); }
-    }
+    if (oldestKey !== null) revealedMap.delete(oldestKey);
   }
 }
 
@@ -197,119 +316,97 @@ editBtn.addEventListener('click', () => {
   if (!isEditing) {
     // 편집 시작
     isEditing = true;
+    leftBody.classList.add('is-editing');
     editBtn.textContent = '완료';
     editBtn.classList.add('done');
+    addTableBtn.style.display = 'inline-block';
+    document.getElementById('heading-hint').style.display = 'inline';
     leftTitle.setAttribute('contenteditable', 'true');
-    leftBody.querySelectorAll('p[data-p]').forEach(p => p.setAttribute('contenteditable', 'true'));
-    leftTable.querySelectorAll('td').forEach(td => td.setAttribute('contenteditable', 'true'));
-    paragraphState = captureParagraphState();
+    leftBody.querySelectorAll('p, .heading-text').forEach(el => el.setAttribute('contenteditable', 'true'));
+    leftBody.querySelectorAll('td').forEach(td => td.setAttribute('contenteditable', 'true'));
+    leftBody.setAttribute('contenteditable', 'true'); // 새 문단(Enter)이나 맨 끝 추가 입력 허용
+    previousBlocks = extractBlocks(leftBody);
     leftTitle.focus();
   } else {
     // 편집 완료 -> 오른쪽에 반영
     isEditing = false;
+    leftBody.classList.remove('is-editing');
     editBtn.textContent = '편집';
     editBtn.classList.remove('done');
+    addTableBtn.style.display = 'none';
+    document.getElementById('heading-hint').style.display = 'none';
     leftTitle.removeAttribute('contenteditable');
-    leftBody.querySelectorAll('p[data-p]').forEach(p => p.removeAttribute('contenteditable'));
-    leftTable.querySelectorAll('td').forEach(td => td.removeAttribute('contenteditable'));
+    leftBody.removeAttribute('contenteditable');
+    leftBody.querySelectorAll('p, .heading-text').forEach(el => el.removeAttribute('contenteditable'));
+    leftBody.querySelectorAll('td').forEach(td => td.removeAttribute('contenteditable'));
+
+    convertPendingHeadings(leftBody);
+    renumberHeadings(leftBody);
+    leftBody.querySelectorAll('table.wiki-table').forEach(ensureTableRemoveButton);
 
     leftMeta.textContent = '최종 수정 시각 : ' + formatTimestamp(new Date());
-    refreshFlash(flashLeft);
+    refreshFlash(document.getElementById('flash-left'));
 
-    // 제목: 즉시 반영 (구조 요소라 5문장 큐와 무관)
     const currentTitle = leftTitle.textContent.trim();
-    if (currentTitle !== rightTitle.textContent.trim()) {
-      rightTitle.textContent = currentTitle;
-    }
+    if (currentTitle !== rightTitle.textContent.trim()) rightTitle.textContent = currentTitle;
 
-    // 문단별 문장 비교
-    const newState = captureParagraphState();
+    const currentBlocks = extractBlocks(leftBody);
+    const prevById = new Map(previousBlocks.map(b => [b.id, b]));
     let anyChange = false;
-    const touchedThisRound = [];
 
-    Object.keys(newState).forEach(pIndex => {
-      const oldSentences = paragraphState[pIndex] || [];
-      const newSentences = newState[pIndex] || [];
-
-      if (newSentences.length !== oldSentences.length) {
-        // 문장 개수 자체가 바뀐 경우: 이 문단은 span을 다시 만들고, 전부 숨김에서 시작
-        const p = rightBody.querySelector(`p[data-p="${pIndex}"]`);
-        if (p) {
-          p.innerHTML = newSentences.map((s, i) =>
-            `<span class="sentence hidden" data-p="${pIndex}" data-s="${i}">${s}</span>`
-          ).join(' ');
-        }
-        // 이 문단에 속했던 기존 revealedMap 항목은 정리
-        Array.from(revealedMap.keys()).forEach(key => {
-          if (key.split('-')[0] === pIndex) revealedMap.delete(key);
-        });
-      }
-
-      const maxLen = Math.max(oldSentences.length, newSentences.length);
+    currentBlocks.forEach(block => {
+      if (block.type !== 'paragraph') { anyChange = true; return; } // 소제목/표는 구조 변경이라 항상 갱신으로 취급
+      const prevBlock = prevById.get(block.id);
+      const oldSentences = prevBlock && prevBlock.type === 'paragraph' ? prevBlock.sentences : [];
+      const maxLen = Math.max(oldSentences.length, block.sentences.length);
       for (let i = 0; i < maxLen; i++) {
         const oldS = oldSentences[i] || '';
-        const newS = newSentences[i] || '';
+        const newS = block.sentences[i] || '';
         if (oldS !== newS && newS) {
           anyChange = true;
-          const key = pIndex + '-' + i;
-          const d = simpleWordDiff(oldS, newS);
-          const diffHtml = d.before +
-            (d.removed ? '<span class="diff-removed">' + d.removed + '</span>' : '') +
-            (d.added ? '<span class="diff-added">' + d.added + '</span>' : '') +
-            d.after;
-
+          const key = block.id + '-' + i;
           touchCounter++;
           revealedMap.set(key, { text: newS, lastTouched: touchCounter });
-          touchedThisRound.push({ key, diffHtml, plain: newS });
         }
       }
     });
 
-    // 표 셀 비교 (틀은 항상 보이고, 값이 채워지면 그 즉시 드러남 — 5개 제한 없음)
-    leftTable.querySelectorAll('td[data-cell]').forEach(td => {
-      const cellIndex = td.dataset.cell;
-      const rightTd = rightTable.querySelector(`td[data-cell="${cellIndex}"]`);
-      const val = td.textContent.trim();
-      if (rightTd && rightTd.textContent.trim() !== val) {
-        rightTd.textContent = val;
-        anyChange = true;
-      }
-    });
-    // 표 라벨 열도 왼쪽 수정 시 함께 반영
-    leftTable.querySelectorAll('td.label').forEach((td, i) => {
-      const rightLabelTds = rightTable.querySelectorAll('td.label');
-      if (rightLabelTds[i] && rightLabelTds[i].textContent.trim() !== td.textContent.trim()) {
-        rightLabelTds[i].textContent = td.textContent.trim();
-      }
-    });
+    if (currentBlocks.length !== previousBlocks.length) anyChange = true;
 
     if (anyChange) {
       evictIfNeeded();
+      renderRightBody(currentBlocks);
 
-      // 새로 바뀐 문장들: diff 표시 후 정착
-      touchedThisRound.forEach(({ key, diffHtml }) => {
-        const [p, s] = key.split('-');
-        const span = rightBody.querySelector(`.sentence[data-p="${p}"][data-s="${s}"]`);
-        if (span) {
-          span.classList.remove('hidden');
-          span.innerHTML = diffHtml;
-        }
+      // 이번 편집에서 바뀐 문장만 diff로 잠깐 보여주고 정착
+      currentBlocks.forEach(block => {
+        if (block.type !== 'paragraph') return;
+        const prevBlock = prevById.get(block.id);
+        const oldSentences = prevBlock && prevBlock.type === 'paragraph' ? prevBlock.sentences : [];
+        block.sentences.forEach((newS, i) => {
+          const oldS = oldSentences[i] || '';
+          if (oldS !== newS && newS) {
+            const key = block.id + '-' + i;
+            const d = simpleWordDiff(oldS, newS);
+            const diffHtml = d.before +
+              (d.removed ? '<span class="diff-removed">' + d.removed + '</span>' : '') +
+              (d.added ? '<span class="diff-added">' + d.added + '</span>' : '') +
+              d.after;
+            const span = rightBody.querySelector(`.sentence[data-key="${key}"]`);
+            if (span) span.innerHTML = diffHtml;
+          }
+        });
       });
 
-      refreshFlash(flashRight);
+      refreshFlash(document.getElementById('flash-right'));
       version += 0.1;
       rightVersion.textContent = 'ver. ' + version.toFixed(1);
 
       setTimeout(() => {
-        touchedThisRound.forEach(({ key, plain }) => {
-          const [p, s] = key.split('-');
-          const span = rightBody.querySelector(`.sentence[data-p="${p}"][data-s="${s}"]`);
-          if (span) span.textContent = plain;
-        });
+        renderRightBody(currentBlocks);
       }, 1300);
     }
 
-    paragraphState = newState;
+    previousBlocks = currentBlocks;
   }
 });
 

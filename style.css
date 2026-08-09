@@ -8,21 +8,23 @@
   --removed-bg: #f5d4c4;
   --added-bg: #d3e8da;
 }
-body {
-  font-family: 'sandoll-gothicneo1', sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-weight: 300;
-  font-style: normal;
-}
-
 
 * { box-sizing: border-box; }
 
+
+body {
+  font-family:'sandoll-gothicneo1', sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
 html, body {
   margin: 0;
   height: 100%;
   background: var(--bg);
   color: var(--light-text);
-  font-family: 'sandoll-gothicneo1', sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'sandoll-gothicneo1', sans-serif;
+  font-weight: 100;
+  font-style: normal;
   overflow: hidden;
 }
 
@@ -67,7 +69,7 @@ html, body {
   border: none;
   color: var(--light-muted);
   font-size: 18px;
-  font-family: inherit;
+  font-family: 'sandoll-gothicneo1', sans-serif;
   cursor: pointer;
   padding: 4px 8px;
   transition: color 0.2s ease;
@@ -98,7 +100,7 @@ html, body {
   position: absolute;
   top: 78px;
   left: 32px;
-  background: #1c1c1c;
+  background: #2c2c2c;
   border: 1px solid #3a3a3a;
   border-radius: 8px;
   padding: 8px 0;
@@ -120,7 +122,7 @@ html, body {
   background: none;
   border: none;
   color: var(--light-text);
-  font-family: inherit;
+  font-family: 'sandoll-gothicneo1', sans-serif;
   font-size: 15px;
   text-align: left;
   padding: 10px 18px;
@@ -220,7 +222,7 @@ html, body {
 .edit-btn:hover { background: #e6e8ec; }
 .edit-btn.done { background: #2c2c2c; color: #f0f2f5; border-color: #2c2c2c; }
 
-.wiki-body { font-size: 14px; line-height: 1.9; outline: none; font-weight: 300; }
+.wiki-body { font-size: 14px; line-height: 1.9; outline: none; }
 .wiki-body[contenteditable="true"] { background: rgba(0,0,0,0.02); }
 .wiki-body p { margin: 0 0 16px 0; }
 
@@ -230,6 +232,22 @@ html, body {
   margin: 28px 0 10px 0;
   border-bottom: 1px solid #c9cbd0;
   padding-bottom: 8px;
+}
+.wiki-subheading2 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 20px 0 8px 20px;
+  border-bottom: none;
+  padding-bottom: 0;
+  color: #4a4d53;
+}
+.heading-num {
+  color: #9a9da3;
+  font-weight: 400;
+  margin-right: 2px;
+}
+.heading-text[contenteditable="true"] {
+  background: rgba(0,0,0,0.03);
 }
 
 .wiki-table {
@@ -248,6 +266,19 @@ html, body {
 
 .diff-removed { background: var(--removed-bg); text-decoration: line-through; }
 .diff-added { background: var(--added-bg); }
+
+.table-block { position: relative; }
+.table-remove-btn {
+  display: none;
+  font-family: 'sandoll-gothicneo1', sans-serif;
+  font-size: 11px;
+  color: #b23b3b;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 6px 0;
+}
+.is-editing .table-remove-btn { display: inline-block; }
 
 /* 오른쪽 패널: 기본은 배경색과 완전히 같은 색이라 안 보이지만, 자리는 그대로 차지함 */
 .sentence {
