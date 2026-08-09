@@ -8,6 +8,11 @@
   --removed-bg: #f5d4c4;
   --added-bg: #d3e8da;
 }
+body {
+  font-family: sandoll-gothicneo1, sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
 
 * { box-sizing: border-box; }
 
@@ -16,7 +21,7 @@ html, body {
   height: 100%;
   background: var(--bg);
   color: var(--light-text);
-  font-family: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'sandoll-gothicneo1, sans-serif;', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow: hidden;
 }
 
