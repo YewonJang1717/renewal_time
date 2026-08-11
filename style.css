@@ -162,9 +162,10 @@ html, body {
 .explain-body {
   margin-left: auto;
   max-width: 520px;
-  font-size: 19px;
+  font-size: 18px;
   line-height: 1.9;
   color: var(--light-text);
+  white-space: pre-wrap;
 }
 .explain-body span.word {
   display: inline-block;
