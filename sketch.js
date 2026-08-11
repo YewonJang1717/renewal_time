@@ -77,7 +77,7 @@ const explainScroll = document.getElementById('explain-scroll');
 // explainParagraphs와 같은 개수로, 각 화면마다 다르게 넣을 제목
 const explainHeadings = [
   "들어가는 말",
-  "갱신하는 앱",
+  "갱신되는 앱",
   "갱신하는 시간",
   "끝맺는 말"
 ];
