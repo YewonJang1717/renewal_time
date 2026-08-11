@@ -43,9 +43,14 @@ document.querySelectorAll('[data-menu-toggle]').forEach(btn => {
 });
 document.addEventListener('click', closeAllMenus);
 
-// ---------- 설명 화면: 단어별 scramble 효과 (줄바꿈 \n 지원) ----------
-const explainSource = "오늘날 우리는 디지털 환경에서 많은 시간을 보낸다. 그 속에서 5년, 10년, 20년, 또는 그보다도 더 된 과거의 기록들을 마주하기도 한다. 그럴 때 우리는 디지털 기록에서 영원을 느낀다. 우리가 죽어도, 우리의 다음 세대가 죽어도, 우리의 기록은 이 인터넷 세계에 똑같이 남아있는 게 아닐까? 그러나 동시에 디지털 기록은 어쩌면, 아날로그보다 훨씬 연약한 것일 수 있다. 우리가 남긴 기록은 우리가 눈 한 번 깜빡하는 사이 완전히 다른 내용으로 바뀌어 있을지도 모른다.\n\n웹은 갱신된다. 이 작업에서, 우리는 그렇게 정의했다. 그 갱신이란 건 무엇일까? 웹에는 어떻게 시간의 흔적이 남고 있는 것일까.";
-const explainEl = document.getElementById('explain-text');
+// ---------- 설명 화면: 문단 하나의 배열로 통합 관리 ----------
+const explainParagraphs = [
+  "오늘날 우리는 디지털 환경에서 많은 시간을 보낸다. 그 속에서 5년, 10년, 20년, 또는 그보다도 더 된 과거의 기록들을 마주하기도 한다. 그럴 때 우리는 디지털 기록에서 영원을 느낀다. 우리가 죽어도, 우리의 다음 세대가 죽어도, 우리의 기록은 이 인터넷 세계에 똑같이 남아있는 게 아닐까? 그러나 동시에 디지털 기록은 어쩌면, 아날로그보다 훨씬 연약한 것일 수 있다. 우리가 남긴 기록은 우리가 눈 한 번 깜빡하는 사이 완전히 다른 내용으로 바뀌어 있을지도 모른다.\n\n웹은 갱신된다. 이 작업에서, 우리는 그렇게 정의했다. 그 갱신이란 건 무엇일까? 비물질적인 매체인 웹에는 어떻게 시간의 흔적이 남고 있는 것일까?",
+  "갱신이란 무엇일까? 네이버 국어사전에 따르면, 갱신이란 단어는 ‘이미 있던 것을 고쳐 새롭게 하다’, ‘기존의 내용을 변동된 사실에 따라 변경ㆍ추가ㆍ삭제하는 일’이라는 의미를 갖고 있다. 종이에 인쇄된 내용은 변하지 않는다. 물론 찢어지고, 물에 젖고, 불에 타는 등의 변화는 일어날 수 있을 것이다. 하지만 그것은 종이라는 매체에 일어나는 변화일 뿐, 내용에 일어나는 변화가 아니다. \n\n웹에서는 다르다. 이미 완성해 배포한 웹이라도, 코드를 조금 수정하면 순식간에 디자인을 바꿀 수 있다. 배경색을 바꾸는 것도, 새로운 사진을 넣는 것도, 글을 조금 삭제하는 것도 너무 간단한 일이다. 웹에서는 매체 뿐만 아니라 내용도 변화를 겪는다. 변경되고, 추가되고, 삭제된다. 그래서 우리는 웹이 갱신된다고 한다.",
+  "우리는 어떨 때 웹에서 갱신을 경험할까? 일상적인 예시로는 새로고침에 의한 갱신이 있다. 유튜브, 인스타그램, 뉴스 사이트··· 많은 웹에서 새로고침에 의한 갱신이 일어난다. \n\n또다른 예시로는 덮어쓰기가 있다. 글의 내용이, 이미지가, 어떨 땐 사이트 자체가 통째로 덮어씌워져 아예 다른 무언가가 되어버린다. 업데이트도 이와 비슷한 방식으로 이루어진다. \n\n예전에 본 적 있는 사이트에 404 error가 뜨며 접속이 불가능하게 된 경험이 있을 것이다. 화면에 남은 건 오류 메시지 뿐이지만, 이 역시 기존의 기록이 삭제되었다는 점에서 갱신으로 볼 수 있다.\n\n이 웹사이트는 갱신을 테마로 한다. 우리는 갱신을 특징으로 하는 웹의 형태 중 위키를 선택했다. 체험 화면에서,(쓰는 중)",
+  "쓰고있어요",
+];
+const explainIntroCount = 1; // 앞에서 몇 번째까지 도입부(스크램블)로 볼지
 const scrambleChars = 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ#%&*';
 
 function attachScramble(span) {
@@ -67,32 +72,51 @@ function attachScramble(span) {
   });
 }
 
-const explainWords = explainSource.split(' ');
-explainWords.forEach((word, i) => {
-  if (word.includes('\n')) {
-    const parts = word.split('\n');
-    parts.forEach((part, idx) => {
-      if (idx > 0) explainEl.appendChild(document.createElement('br'));
-      if (part) {
-        const span = document.createElement('span');
-        span.className = 'word';
-        span.textContent = part;
-        span.dataset.original = part;
-        explainEl.appendChild(span);
-        attachScramble(span);
-      }
+const explainScroll = document.getElementById('explain-scroll');
+
+// explainParagraphs와 같은 개수로, 각 화면마다 다르게 넣을 제목
+const explainHeadings = [
+  "들어가는 말",
+  "갱신하는 앱",
+  "갱신하는 시간",
+  "끝맺는 말"
+];
+
+explainParagraphs.forEach((paragraph, pIndex) => {
+  const page = document.createElement('div');
+  page.className = 'explain-page';
+
+  const h2 = document.createElement('h2');
+  h2.textContent = explainHeadings[pIndex] || '';
+  page.appendChild(h2);
+
+  const body = document.createElement('div');
+  body.className = 'explain-body';
+
+  if (pIndex < explainIntroCount) {
+    const words = paragraph.split(' ');
+    words.forEach((word, i) => {
+      const span = document.createElement('span');
+      span.className = 'word';
+      span.textContent = word;
+      span.dataset.original = word;
+      body.appendChild(span);
+      attachScramble(span);
+      if (i < words.length - 1) body.appendChild(document.createTextNode(' '));
     });
   } else {
-    const span = document.createElement('span');
-    span.className = 'word';
-    span.textContent = word;
-    span.dataset.original = word;
-    explainEl.appendChild(span);
-    attachScramble(span);
+    body.textContent = paragraph;
   }
-  if (i < explainWords.length - 1) explainEl.appendChild(document.createTextNode(' '));
+  page.appendChild(body);
+
+  explainScroll.appendChild(page);
 });
 
+const scrollHint = document.getElementById('scroll-hint');
+explainScroll.addEventListener('scroll', () => {
+  const nearBottom = explainScroll.scrollTop + explainScroll.clientHeight >= explainScroll.scrollHeight - 10;
+  scrollHint.classList.toggle('faded', nearBottom);
+});
 // ---------- 체험 화면: 좌우 패널 hover 확대 ----------
 const panelLeft = document.getElementById('panel-left');
 const panelRight = document.getElementById('panel-right');

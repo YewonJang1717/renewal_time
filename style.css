@@ -1,9 +1,9 @@
 :root {
   --bg: #2c2c2c;
-  --panel: #f0f2f5;
+  --panel: #fafaf8;
   --panel-text: #2c2c2c;
   --panel-muted: #8a8d93;
-  --light-text: #f0f2f5;
+  --light-text: #fafaf8;
   --light-muted: #9a9a9a;
   --removed-bg: #f5d4c4;
   --added-bg: #d3e8da;
@@ -133,23 +133,36 @@ html, body {
 }
 
 /* ---------- 설명 화면 ---------- */
+/* ---------- 설명 화면 ---------- */
 #screen-explain {
-  padding: 100px 8vw 0;
+  padding: 0;
 }
-.explain-title {
-  font-size: clamp(36px, 5vw, 64px);
+.explain-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+}
+.explain-page {
+  position: relative;
+  height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  padding: 0 8vw;
+}
+.explain-page h2 {
+  position: absolute;
+  top: 100px;
+  left: 8vw;
+  font-size: clamp(28px, 4vw, 48px);
   font-weight: 700;
-  margin: 40px 0 0 0;
+  margin: 0;
 }
 .explain-body {
-  position: absolute;
-  right: 8vw;
-  top: 50%;
-  transform: translateY(-50%);
-  max-width: 480px;
-  max-height: 80vh;
-  overflow-y: auto;
-  font-size: 15px;
+  margin-left: auto;
+  max-width: 520px;
+  font-size: 19px;
   line-height: 1.9;
   color: var(--light-text);
 }
@@ -159,7 +172,24 @@ html, body {
 .explain-body span.word:hover {
   color: #ffffff;
 }
-
+.scroll-hint {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  color: var(--light-muted);
+  animation: scroll-bounce 1.8s ease-in-out infinite;
+}
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
+  50% { transform: translateX(-50%) translateY(10px); opacity: 1; }
+}
+.scroll-hint.faded {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
 /* ---------- 체험 화면 ---------- */
 #screen-experience {
   padding: 100px 4vw 4vw;
@@ -213,14 +243,14 @@ html, body {
   font-family: 'sandoll-gothicneo1', 'sans-serif';
   font-size: 12px;
   border: 1px solid #b8bac0;
-  background: #ffffff;
+  background: #fafaf8;
   color: var(--panel-text);
   border-radius: 6px;
   padding: 6px 14px;
   cursor: pointer;
 }
 .edit-btn:hover { background: #e6e8ec; }
-.edit-btn.done { background: #2c2c2c; color: #f0f2f5; border-color: #2c2c2c; }
+.edit-btn.done { background: #2c2c2c; color: #fafaf8; border-color: #2c2c2c; }
 
 .wiki-body { font-size: 14px; line-height: 1.9; outline: none; }
 .wiki-body[contenteditable="true"] { background: rgba(0,0,0,0.02); }
@@ -301,7 +331,7 @@ html, body {
   top: 34px;
   right: 0;
   background: #2c2c2c;
-  color: #f0f2f5;
+  color: #fafaf8;
   border-radius: 8px;
   padding: 12px 14px;
   width: 220px;
@@ -324,7 +354,7 @@ html, body {
   top: 32px;
   left: 50%;
   transform: translateX(-50%) translateY(-10px);
-  background: #f0f2f5;
+  background: #fafaf8;
   color: #2c2c2c;
   font-size: 13px;
   padding: 10px 20px;
@@ -348,7 +378,7 @@ html, body {
 .refresh-flash {
   position: absolute;
   inset: 0;
-  background: #ffffff;
+  background: #fafaf8;
   opacity: 0;
   pointer-events: none;
   border-radius: 18px;
