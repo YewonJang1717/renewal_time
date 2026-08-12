@@ -108,7 +108,7 @@ html, body {
   right: 0;
   height: 64px;
   display: flex;
-  border-top: 1px solid #3a3a3a;
+  border-top: 3px solid #3a3a3a;
   background: var(--bg);
   z-index: 20;
 }
@@ -152,6 +152,10 @@ html, body {
   font-size: clamp(28px, 4vw, 48px);
   font-weight: 700;
   margin: 0;
+  perspective: 500px;
+}
+.explain-page h2 .char {
+  display: inline-block;
 }
 
 .explain-body {

@@ -14,6 +14,7 @@ function goTo(name) {
   }
   if (name === 'explain') {
     document.getElementById('explain-scroll').scrollTop = 0;
+    playIntroHeadingAnimation();
     const toast = document.getElementById('scroll-toast');
     toast.classList.add('show');
     clearTimeout(goTo._toastTimer);
@@ -118,6 +119,49 @@ explainParagraphs.forEach((paragraph, pIndex) => {
 
   explainScroll.appendChild(page);
 });
+
+// ---------- GSAP: 큰 제목(h2)에 스크롤 등장 애니메이션 ----------
+// ---------- GSAP: 큰 제목(h2)에 등장 애니메이션 ----------
+gsap.registerPlugin(ScrollTrigger);
+
+document.querySelectorAll('.explain-page h2').forEach((heading, hIndex) => {
+  const chars = heading.textContent.split('');
+  heading.innerHTML = chars
+    .map(c => `<span class="char">${c === ' ' ? '&nbsp;' : c}</span>`)
+    .join('');
+
+  if (hIndex === 0) return; // 첫 화면(도입부)은 스크롤이 아니라 화면 진입 시 별도로 재생
+
+  gsap.fromTo(
+    heading.querySelectorAll('.char'),
+    { opacity: 0, y: 50, rotateX: -70 },
+    {
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      duration: 0.7,
+      stagger: 0.035,
+      ease: 'back.out(1.7)',
+      scrollTrigger: {
+        trigger: heading,
+        scroller: '#explain-scroll',
+        start: 'top 75%',
+        toggleActions: 'play none none reverse'
+      }
+    }
+  );
+});
+
+// 첫 화면(도입부) 제목은 설명 화면을 열 때마다 직접 재생
+function playIntroHeadingAnimation() {
+  const firstHeading = document.querySelector('.explain-page h2');
+  if (!firstHeading) return;
+  gsap.fromTo(
+    firstHeading.querySelectorAll('.char'),
+    { opacity: 0, y: 50, rotateX: -70 },
+    { opacity: 1, y: 0, rotateX: 0, duration: 0.7, stagger: 0.035, ease: 'back.out(1.7)' }
+  );
+}
 
 const scrollHint = document.getElementById('scroll-hint');
 explainScroll.addEventListener('scroll', () => {
