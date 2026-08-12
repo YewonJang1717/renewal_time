@@ -13,10 +13,11 @@ function goTo(name) {
     document.getElementById('intro-overlay').classList.add('show');
   }
   if (name === 'explain') {
+    document.getElementById('explain-scroll').scrollTop = 0;
     const toast = document.getElementById('scroll-toast');
     toast.classList.add('show');
     clearTimeout(goTo._toastTimer);
-    goTo._toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+    goTo._toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
   }
 }
 // ESC 키로 메인 화면 복귀
@@ -251,6 +252,7 @@ function ensureRowControls(table) {
     const btn = document.createElement('button');
     btn.className = 'row-remove-btn';
     btn.textContent = '✕';
+    btn.setAttribute('contenteditable', 'false');
     btn.addEventListener('click', () => { tr.remove(); });
     td.appendChild(btn);
     tr.appendChild(td);
@@ -269,11 +271,13 @@ function ensureTableRemoveButton(table) {
   const removeBtn = document.createElement('button');
   removeBtn.className = 'table-remove-btn';
   removeBtn.textContent = '✕ 표 삭제';
+  removeBtn.setAttribute('contenteditable', 'false');
   removeBtn.addEventListener('click', () => { wrap.remove(); });
 
   const addRowBtn = document.createElement('button');
   addRowBtn.className = 'row-add-btn';
   addRowBtn.textContent = '+ 행 추가';
+  addRowBtn.setAttribute('contenteditable', 'false');
   addRowBtn.addEventListener('click', () => {
     const tr = document.createElement('tr');
     tr.innerHTML = `<td class="label" contenteditable="true">항목</td><td contenteditable="true"></td>`;
@@ -287,6 +291,19 @@ function ensureTableRemoveButton(table) {
 }
 leftBody.querySelectorAll('table.wiki-table').forEach(ensureTableRemoveButton);
 
+// 지금 커서가 leftBody 안 어느 "직계 블록"(문단/소제목/표) 안에 있는지 찾기
+function getCurrentBlockElement() {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return null;
+  let node = sel.getRangeAt(0).startContainer;
+  if (node.nodeType === 3) node = node.parentElement; // 텍스트 노드면 부모로
+  while (node && node.parentElement !== leftBody) {
+    node = node.parentElement;
+    if (!node) return null;
+  }
+  return node;
+}
+
 addTableBtn.addEventListener('click', () => {
   const table = document.createElement('table');
   table.className = 'wiki-table';
@@ -294,7 +311,26 @@ addTableBtn.addEventListener('click', () => {
     <tr><td class="label" contenteditable="true">항목</td><td contenteditable="true"></td></tr>
     <tr><td class="label" contenteditable="true">항목</td><td contenteditable="true"></td></tr>
   `;
-  leftBody.appendChild(table);
+
+  const currentBlock = getCurrentBlockElement();
+  let insertAfterNode; // 표를 넣은 뒤, "표 바로 다음"을 가리키는 기준점
+  if (currentBlock && currentBlock.nextSibling) {
+    leftBody.insertBefore(table, currentBlock.nextSibling);
+    insertAfterNode = table;
+  } else {
+    leftBody.appendChild(table);
+    insertAfterNode = table;
+  }
+
+  // 표 바로 다음에 클릭해서 이어 쓸 문단이 없으면, 빈 문단을 하나 만들어줌
+  const nextEl = insertAfterNode.nextElementSibling;
+  if (!nextEl || nextEl.tagName !== 'P') {
+    const emptyP = document.createElement('p');
+    emptyP.setAttribute('contenteditable', 'true');
+    emptyP.innerHTML = '<br>'; // 완전히 빈 <p>는 클릭이 안 먹는 브라우저가 있어서 <br>로 높이를 확보
+    leftBody.insertBefore(emptyP, insertAfterNode.nextSibling);
+  }
+
   ensureTableRemoveButton(table);
   table.querySelector('td').focus();
 });
