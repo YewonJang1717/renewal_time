@@ -124,6 +124,14 @@ explainScroll.addEventListener('scroll', () => {
   const nearBottom = explainScroll.scrollTop + explainScroll.clientHeight >= explainScroll.scrollHeight - 10;
   scrollHint.classList.toggle('faded', nearBottom);
 });
+
+const explainPages = document.querySelectorAll('.explain-page');
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('revealed');
+  });
+}, { threshold: 0.4 });
+explainPages.forEach(page => revealObserver.observe(page));
 // ---------- 체험 화면: 좌우 패널 hover 확대 ----------
 const panelLeft = document.getElementById('panel-left');
 const panelRight = document.getElementById('panel-right');
