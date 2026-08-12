@@ -17,7 +17,7 @@ function goTo(name) {
     const toast = document.getElementById('scroll-toast');
     toast.classList.add('show');
     clearTimeout(goTo._toastTimer);
-    goTo._toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    goTo._toastTimer = setTimeout(() => toast.classList.remove('show'), 1000);
   }
 }
 // ESC 키로 메인 화면 복귀
