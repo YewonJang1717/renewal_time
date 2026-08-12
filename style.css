@@ -290,8 +290,9 @@ html, body {
 .wiki-table td {
   border: 1px solid #c9cbd0;
   padding: 10px 12px;
+  color: #2c2c2c;
 }
-.wiki-table td.label { width: 120px; color: var(--panel-muted); }
+.wiki-table td.label { width: 120px; color: #2c2c2c; }
 .wiki-table td[contenteditable="true"] { background: rgba(0,0,0,0.02); }
 
 .diff-removed { background: var(--removed-bg); text-decoration: line-through; }
