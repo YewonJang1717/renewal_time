@@ -8,41 +8,32 @@ const screens = {
 function goTo(name) {
   Object.values(screens).forEach(s => s.classList.remove('active'));
   screens[name].classList.add('active');
-  closeAllMenus();
+  updateActiveTab(name);
   if (name === 'experience') {
-    const hint = document.getElementById('intro-hint');
-    hint.classList.add('show');
-    clearTimeout(goTo._hintTimer);
-    goTo._hintTimer = setTimeout(() => hint.classList.remove('show'), 4000);
+    document.getElementById('intro-overlay').classList.add('show');
+  }
+  if (name === 'explain') {
+    const toast = document.getElementById('scroll-toast');
+    toast.classList.add('show');
+    clearTimeout(goTo._toastTimer);
+    goTo._toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
   }
 }
+// ESC 키로 메인 화면 복귀
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') goTo('main');
+});
 
 document.querySelectorAll('[data-nav]').forEach(btn => {
   btn.addEventListener('click', () => goTo(btn.dataset.nav));
 });
 
-// ---------- 햄버거 메뉴 ----------
-const menus = {
-  explain: document.getElementById('menu-explain'),
-  experience: document.getElementById('menu-experience'),
-};
-
-function closeAllMenus() {
-  Object.values(menus).forEach(m => m.classList.remove('open'));
-}
-
-document.querySelectorAll('[data-menu-toggle]').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const screenId = btn.closest('.screen').id.replace('screen-', '');
-    const menu = menus[screenId];
-    const isOpen = menu.classList.contains('open');
-    closeAllMenus();
-    if (!isOpen) menu.classList.add('open');
+// ---------- 탭 메뉴 ----------
+function updateActiveTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.nav === name);
   });
-});
-document.addEventListener('click', closeAllMenus);
-
+}
 // ---------- 설명 화면: 문단 하나의 배열로 통합 관리 ----------
 const explainParagraphs = [
   "  오늘날 우리는 디지털 환경에서 많은 시간을 보낸다. 그 속에서 5년, 10년, 20년, 또는 그보다도 더 된 과거의 기록들을 마주하기도 한다. 그럴 때 우리는 디지털 기록에서 영원을 느낀다. 우리가 죽어도, 우리의 다음 세대가 죽어도, 우리의 기록은 이 인터넷 세계에 똑같이 남아있는 게 아닐까? 그러나 동시에 디지털 기록은 어쩌면, 아날로그보다 훨씬 연약한 것일 수 있다. 우리가 남긴 기록은 우리가 눈 한 번 깜빡하는 사이 완전히 다른 내용으로 바뀌어 있을지도 모른다.<br>  웹은 갱신된다. 이 작업에서, 우리는 그렇게 정의했다. 그 갱신이란 건 무엇일까? 비물질적인 매체인 웹에는 어떻게 시간의 흔적이 남고 있는 것일까?",
@@ -147,8 +138,8 @@ function setActivePanel(activePanel) {
 panelLeft.addEventListener('mouseenter', () => setActivePanel(panelLeft));
 panelRight.addEventListener('mouseenter', () => setActivePanel(panelRight));
 experienceStage.addEventListener('mouseleave', () => setActivePanel(null));
-panelLeft.addEventListener('click', () => {
-  document.getElementById('intro-hint').classList.remove('show');
+document.getElementById('intro-confirm-btn').addEventListener('click', () => {
+  document.getElementById('intro-overlay').classList.remove('show');
 });
 
 // ==========================================================================
@@ -383,26 +374,17 @@ function evictIfNeeded() {
   }
 }
 
-const helpWrap = document.getElementById('help-wrap');
-const helpBtn = document.getElementById('help-btn');
-const helpPopover = document.getElementById('help-popover');
-helpBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  helpPopover.classList.toggle('open');
-});
-document.addEventListener('click', (e) => {
-  if (!helpWrap.contains(e.target)) helpPopover.classList.remove('open');
-});
+
 
 editBtn.addEventListener('click', () => {
   if (!isEditing) {
     // 편집 시작
     isEditing = true;
     leftBody.classList.add('is-editing');
+    document.getElementById('edit-guide-overlay').classList.add('show');
     editBtn.textContent = '완료';
     editBtn.classList.add('done');
     addTableBtn.style.display = 'inline-block';
-    document.getElementById('help-wrap').style.display = 'inline-block';
     leftTitle.setAttribute('contenteditable', 'true');
     leftBody.querySelectorAll('p, .heading-text').forEach(el => el.setAttribute('contenteditable', 'true'));
     leftBody.querySelectorAll('td:not(.row-controls)').forEach(td => td.setAttribute('contenteditable', 'true'));
@@ -416,8 +398,6 @@ editBtn.addEventListener('click', () => {
     editBtn.textContent = '편집';
     editBtn.classList.remove('done');
     addTableBtn.style.display = 'none';
-    document.getElementById('help-wrap').style.display = 'none';
-    helpPopover.classList.remove('open');
     leftTitle.removeAttribute('contenteditable');
     leftBody.removeAttribute('contenteditable');
     leftBody.querySelectorAll('p, .heading-text').forEach(el => el.removeAttribute('contenteditable'));
@@ -491,6 +471,9 @@ editBtn.addEventListener('click', () => {
 
     previousBlocks = currentBlocks;
   }
+});
+document.getElementById('edit-guide-confirm-btn').addEventListener('click', () => {
+  document.getElementById('edit-guide-overlay').classList.remove('show');
 });
 
 leftMeta.textContent = '최종 수정 시각 : ' + formatTimestamp(new Date());

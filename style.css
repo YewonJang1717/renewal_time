@@ -11,7 +11,7 @@
 
 body {
   font-family: 'sandoll-gothicneo1', 'sans-serif';
-  font-weight: 100;
+  font-weight: 200;
   font-style: normal;
 }
 
@@ -23,7 +23,7 @@ html, body {
   background: var(--bg);
   color: var(--light-text);
   font-family: 'sandoll-gothicneo1', 'sans-serif';
-  font-weight: 100;
+  font-weight: 200;
   font-style: normal;
   overflow: hidden;
 }
@@ -53,7 +53,7 @@ html, body {
   transform: translateY(-6vh);
 }
 .main-title {
-  font-size: clamp(32px, 5vw, 56px);
+  font-size: clamp(40px, 7vw, 80px);
   font-weight: 700;
   letter-spacing: -0.02em;
   margin: 0 0 40px 0;
@@ -68,7 +68,7 @@ html, body {
   background: none;
   border: none;
   color: var(--light-muted);
-  font-size: 18px;
+  font-size: 21px;
   font-family: 'sandoll-gothicneo1', 'sans-serif';
   cursor: pointer;
   padding: 4px 8px;
@@ -77,60 +77,55 @@ html, body {
 .main-nav button:hover {
   color: var(--light-text);
 }
-
-/* ---------- 공통 햄버거 메뉴 ---------- */
-.hamburger-btn {
+/* ---------- 화면 하단 탭바 ---------- */
+.tab-bar {
   position: absolute;
-  top: 32px;
-  left: 32px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  display: flex;
+  border-top: 1px solid #3a3a3a;
+  background: var(--bg);
   z-index: 20;
+}
+.tab-btn {
+  flex: 1;
   background: none;
   border: none;
+  color: var(--light-muted);
+  font-family: inherit;
+  font-size: 14px;
   cursor: pointer;
-  padding: 6px;
 }
-.hamburger-btn span {
-  display: block;
-  width: 26px;
-  height: 2px;
-  background: var(--light-text);
-  margin: 5px 0;
-}
-.menu-dropdown {
-  position: absolute;
-  top: 78px;
-  left: 32px;
-  background: #1c1c1c;
-  border: 1px solid #3a3a3a;
-  border-radius: 8px;
-  padding: 8px 0;
-  min-width: 140px;
-  z-index: 21;
-  opacity: 0;
-  transform: translateY(-8px);
-  pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-.menu-dropdown.open {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-.menu-dropdown button {
-  display: block;
-  width: 100%;
-  background: none;
-  border: none;
+.tab-btn.active {
   color: var(--light-text);
-  font-family: 'sandoll-gothicneo1', 'sans-serif';
-  font-size: 15px;
-  text-align: left;
-  padding: 10px 18px;
+  font-weight: 700;
+}.tab-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  display: flex;
+  border-top: 1px solid #3a3a3a;
+  background: var(--bg);
+  z-index: 20;
+}
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--light-muted);
+  font-family: inherit;
+  font-size: 14px;
   cursor: pointer;
 }
-.menu-dropdown button:hover {
-  background: #2c2c2c;
+.tab-btn.active {
+  color: var(--light-text);
+  font-weight: 700;
 }
+
 
 /* ---------- 설명 화면 ---------- */
 /* ---------- 설명 화면 ---------- */
@@ -145,7 +140,7 @@ html, body {
 }
 .explain-page {
   position: relative;
-  height: 100vh;
+  height: calc(100vh - 64px);
   scroll-snap-align: start;
   display: flex;
   align-items: center;
@@ -171,7 +166,7 @@ html, body {
   display: inline-block;
 }
 .explain-body span.word:hover {
-  color: #ffffff;
+  color: #fafaf8;
 }
 .scroll-hint {
   position: absolute;
@@ -193,7 +188,7 @@ html, body {
 }
 /* ---------- 체험 화면 ---------- */
 #screen-experience {
-  padding: 100px 4vw 4vw;
+  padding: 24px 4vw calc(64px + 24px);
   display: flex;
   gap: 24px;
   height: 100%;
@@ -301,72 +296,124 @@ html, body {
 .table-block { position: relative; }
 .table-remove-btn, .row-add-btn {
   display: none;
-  font-family: 'sandoll-gothicneo1', 'sans-serif';
+  font-family: inherit;
   font-size: 11px;
-  color: #b23b3b;
-  background: none;
-  border: none;
+  color: #2c2c2c;
+  background: #fafaf8;
+  border: 1px solid #b8bac0;
+  border-radius: 6px;
+  padding: 4px 10px;
   cursor: pointer;
-  padding: 0 0 6px 0;
-  margin-right: 10px;
+  margin-right: 8px;
 }
-.row-add-btn { color: #2c6e49; }
+.table-remove-btn:hover, .row-add-btn:hover { background: #e6e8ec; }
 .is-editing .table-remove-btn, .is-editing .row-add-btn { display: inline-block; }
 
-.row-controls { display: none; border: none !important; padding: 0 6px !important; width: 24px; }
+.row-controls { display: none; border: none !important; padding: 0 4px !important; width: 30px; }
 .is-editing .row-controls { display: table-cell; }
 .row-remove-btn {
-  font-family: 'sandoll-gothicneo1', 'sans-serif';
+  font-family: inherit;
   font-size: 11px;
-  color: #b23b3b;
-  background: none;
-  border: none;
+  color: #2c2c2c;
+  background: #fafaf8;
+  border: 1px solid #b8bac0;
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
   cursor: pointer;
 }
+.row-remove-btn:hover { background: #e6e8ec; }
 
-/* 편집 안내 팝오버 */
-.help-wrap { position: relative; }
-.help-btn { padding: 4px 10px; border-radius: 50%; }
-.help-popover {
+.scroll-toast {
   position: absolute;
-  top: 34px;
-  right: 0;
-  background: #2c2c2c;
-  color: #fafaf8;
-  border-radius: 8px;
-  padding: 12px 14px;
-  width: 220px;
-  font-size: 12px;
-  line-height: 1.7;
-  opacity: 0;
-  transform: translateY(-6px);
-  pointer-events: none;
-  transition: opacity 0.15s ease, transform 0.15s ease;
-  z-index: 30;
-}
-.help-popover.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
-.help-popover p { margin: 0 0 6px 0; }
-.help-popover p:last-child { margin-bottom: 0; }
-.help-popover code { background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 4px; }
-
-/* 체험 화면 첫 안내 배너 */
-.intro-hint {
-  position: absolute;
-  top: 32px;
+  bottom: 84px;
   left: 50%;
-  transform: translateX(-50%) translateY(-10px);
+  transform: translateX(-50%) translateY(10px);
   background: #fafaf8;
   color: #2c2c2c;
   font-size: 13px;
-  padding: 10px 20px;
-  border-radius: 20px;
+  padding: 10px 24px;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease, transform 0.4s ease;
   z-index: 25;
 }
-.intro-hint.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.scroll-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 
+/* 체험 화면 첫 안내 배너 */
+.intro-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.intro-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.intro-hint {
+  text-align: center;
+  background: #fafaf8;
+  color: #2c2c2c;
+  font-size: 15px;
+  padding: 36px 44px;
+  border-radius: 14px;
+  box-shadow: 0 10px 34px rgba(0,0,0,0.45);
+}
+.intro-hint p {
+  margin: 0 0 20px 0;
+  color: #2c2c2c;
+}
+.intro-confirm-btn {
+  font-family: inherit;
+  font-size: 13px;
+  background: none;
+  border: 1px solid #2c2c2c;
+  color: #2c2c2c;
+  border-radius: 8px;
+  padding: 8px 24px;
+  cursor: pointer;
+}
+.intro-confirm-btn:hover {
+  background: rgba(0,0,0,0.06);
+}
+.edit-guide-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  border-radius: 18px;
+  transition: opacity 0.3s ease;
+}
+.edit-guide-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+  background: rgba(0,0,0,0.15);
+}
+.edit-guide-overlay .intro-hint code {
+  background: rgba(0,0,0,0.06);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
 /* 오른쪽 패널: 기본은 배경색과 완전히 같은 색이라 안 보이지만, 자리는 그대로 차지함 */
 .sentence {
   color: var(--panel-text);

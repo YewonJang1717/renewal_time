@@ -31,31 +31,42 @@
 
   <!-- 설명 화면 -->
   <div id="screen-explain" class="screen">
-  <button class="hamburger-btn" data-menu-toggle><span></span><span></span><span></span></button>
+    <div class="scroll-toast" id="scroll-toast">스크롤하세요.</div>
+    <nav class="tab-bar">
+  <button class="tab-btn" data-nav="explain">설명</button>
+  <button class="tab-btn" data-nav="experience">체험</button>
+</nav>
   <div class="explain-scroll" id="explain-scroll"></div>
   <div class="scroll-hint" id="scroll-hint">↓</div>
 </div>
 
   <!-- 체험 화면 -->
   <div id="screen-experience" class="screen">
-    <button class="hamburger-btn" data-menu-toggle><span></span><span></span><span></span></button>
-    <div class="intro-hint" id="intro-hint">왼쪽 패널의 글을 자유롭게 수정하세요.</div>
+    <nav class="tab-bar">
+  <button class="tab-btn" data-nav="explain">설명</button>
+  <button class="tab-btn" data-nav="experience">체험</button>
+</nav>
+    <div class="intro-overlay" id="intro-overlay">
+  <div class="intro-hint">
+    <p>왼쪽 패널의 글을 자유롭게 수정하세요.</p>
+    <button class="intro-confirm-btn" id="intro-confirm-btn">확인</button>
+  </div>
+</div>
 
     <!-- 왼쪽: 편집 가능한 원본 -->
     <div class="wiki-panel" id="panel-left">
       <div class="refresh-flash" id="flash-left"></div>
+      <div class="edit-guide-overlay" id="edit-guide-overlay">
+    <div class="intro-hint">
+      <p>대분류: <code>=내용=</code> → 1, 2, 3 ...<br>하위항목: <code>-내용-</code> → 1.1, 1.2 ...</p>
+      <button class="intro-confirm-btn" id="edit-guide-confirm-btn">확인</button>
+    </div>
+  </div>
       <div class="wiki-header">
         <h3 class="wiki-doc-title" id="left-title">새로워지는 것들</h3>
         <div class="wiki-header-right">
           <div class="wiki-meta" id="left-meta">최종 수정 시각 : —</div>
           <button class="edit-btn" id="add-table-btn" style="display:none;">+ 표 추가</button>
-          <div class="help-wrap" style="display:none;" id="help-wrap">
-            <button class="edit-btn help-btn" id="help-btn">?</button>
-            <div class="help-popover" id="help-popover">
-              <p><strong>대분류</strong>: <code>=내용=</code> → 1, 2, 3 ...</p>
-              <p><strong>하위항목</strong>: <code>-내용-</code> → 1.1, 1.2 ...</p>
-            </div>
-          </div>
           <button class="edit-btn" id="edit-toggle-btn">편집</button>
         </div>
       </div>
@@ -83,16 +94,6 @@
       <div class="wiki-body" id="right-body"></div>
     </div>
 
-  </div>
-
-  <!-- 화면 이동 메뉴 (설명/체험 공통) -->
-  <div class="menu-dropdown" id="menu-explain">
-    <button data-nav="experience">체험</button>
-    <button data-nav="main">메인</button>
-  </div>
-  <div class="menu-dropdown" id="menu-experience">
-    <button data-nav="explain">설명</button>
-    <button data-nav="main">메인</button>
   </div>
 
 <script src="sketch.js"></script>
