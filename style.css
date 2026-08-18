@@ -409,7 +409,7 @@ html, body {
 .edit-guide-overlay .intro-hint code {
   background: rgba(0,0,0,0.06);
   padding: 1px 5px;
-  border-radius: 2px;
+  border-radius: 4px;
   font-family: inherit;
 }
 .sentence {
@@ -436,7 +436,7 @@ html, body {
 .refresh-flash {
   position: absolute;
   inset: 0;
-  background: #ffffff;
+  background: #fafaf8;
   opacity: 0;
   pointer-events: none;
   border-radius: 8px;
