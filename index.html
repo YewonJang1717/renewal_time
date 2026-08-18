@@ -13,7 +13,7 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>갱신하는 시간</title>
+<title>갱신되는 시간</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,7 +21,7 @@
   <!-- 메인 화면 -->
   <div id="screen-main" class="screen active">
     <div class="main-inner">
-      <h1 class="main-title">갱신하는 시간</h1>
+      <h1 class="main-title">갱신되는 시간</h1>
       <div class="main-nav">
         <button data-nav="explain">이야기하는 시간</button>
         <button data-nav="experience">경험하는 시간</button>
@@ -31,7 +31,7 @@
 
   <!-- 설명 화면 -->
   <div id="screen-explain" class="screen">
-    <div class="scroll-toast" id="scroll-toast">스크롤하세요.</div>
+    <div class="scroll-toast" id="scroll-toast">↓</div>
     <nav class="tab-bar">
   <button class="tab-btn" data-nav="explain">이야기하는 시간</button>
   <button class="tab-btn" data-nav="experience">경험하는 시간</button>
@@ -46,13 +46,7 @@
   <button class="tab-btn" data-nav="explain">이야기하는 시간</button>
   <button class="tab-btn" data-nav="experience">경험하는 시간</button>
 </nav>
-    <div class="intro-overlay" id="intro-overlay">
-  <div class="intro-hint">
-    <p>왼쪽 패널의 글을 자유롭게 수정하세요.</p>
-    <button class="intro-confirm-btn" id="intro-confirm-btn">확인</button>
-  </div>
-</div>
-
+  
     <!-- 왼쪽: 편집 가능한 원본 -->
     <div class="wiki-panel" id="panel-left">
       <div class="refresh-flash" id="flash-left"></div>
@@ -62,13 +56,15 @@
       <button class="intro-confirm-btn" id="edit-guide-confirm-btn">확인</button>
     </div>
   </div>
-      <div class="wiki-header">
-        <h3 class="wiki-doc-title" id="left-title">새로워지는 것들</h3>
-        <div class="wiki-header-right">
-          <div class="wiki-meta" id="left-meta">최종 수정 시각 : —</div>
-          <button class="edit-btn" id="add-table-btn" style="display:none;">+ 표 추가</button>
-          <button class="edit-btn" id="edit-toggle-btn">편집</button>
+        <div class="wiki-header">
+        <div class="wiki-header-top">
+          <h3 class="wiki-doc-title" id="left-title">새로워지는 것들</h3>
+          <div class="wiki-header-right">
+            <button class="edit-btn" id="add-table-btn" style="display:none;">표 추가</button>
+            <button class="edit-btn" id="edit-toggle-btn">편집</button>
+          </div>
         </div>
+        <p class="wiki-notice">이 문서의 글은 자유롭게 수정·삭제할 수 있습니다.</p>
       </div>
       <div class="wiki-body" id="left-body">
         <p>새로워지는 것은 ‘새롭다’는 현상 그 자체, 또는 그러한 현상이 일어나는 대상을 말한다. ‘새롭다’는 단어는 지금까지 있은 적이 없거나 전과 달리 생생하고 산뜻하게 느껴지는 맛이 있을 때 사용한다. 즉 새로워지는 것은 교체나 변화, 생성을 전제로 한다. </p>
@@ -81,14 +77,14 @@
       </div>
     </div>
 
-    <!-- 오른쪽: 왼쪽과 완전히 동일한 구조를 가진 거울. 평소엔 본문 글자 색이 배경색과 같아 안 보이고,
-         최근 수정된 문장만 색이 드러남. 틀(제목/소제목/표)은 항상 보임 -->
-    <div class="wiki-panel" id="panel-right">
+        <div class="wiki-panel" id="panel-right">
       <div class="refresh-flash" id="flash-right"></div>
-      <div class="wiki-header">
-        <h3 class="wiki-doc-title" id="right-title">새로워지는 것들</h3>
-        <div class="wiki-header-right">
-          <div class="wiki-meta" id="right-version">ver. 1.0</div>
+            <div class="wiki-header">
+        <div class="wiki-header-top">
+          <h3 class="wiki-doc-title" id="right-title">새로워지는 것들</h3>
+          <div class="wiki-header-right">
+            <div class="wiki-meta" id="right-version">ver. 1.0</div>
+          </div>
         </div>
       </div>
       <div class="wiki-body" id="right-body"></div>
