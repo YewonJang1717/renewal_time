@@ -742,6 +742,7 @@ function loadState() {
 }
 
 loadState();
+renumberHeadings(leftBody);
 let previousBlocks = snapshotBlocks(leftBody);
 renderDiffAndAnimate(previousBlocks, previousBlocks, { silent: true }); // 초기 상태: 전부 배경색
 
