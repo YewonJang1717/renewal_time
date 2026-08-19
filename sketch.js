@@ -707,6 +707,8 @@ document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP)
     if (currentBlocks.length !== previousBlocks.length) anyChange = true;
 
           if (anyChange) {
+  const touchedThisTurn = new Set(sentenceAnimations.map(a => a.key));
+  evictUntouched(touchedThisTurn); // 이번 턴 이전에 남아있던 것들을 먼저 정리
   renderRightBody(currentBlocks);
   refreshFlash(document.getElementById('flash-right'));
   version += 0.1;
@@ -726,12 +728,6 @@ document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP)
     p.appendChild(ghost);
     animateSentenceReplace(ghost, oldDisplayed, '');
   });
-
-  // 애니메이션이 다 끝난 뒤에야, 이번 턴에 안 바뀐 이전 문장들을 정리
-  const touchedThisTurn = new Set(sentenceAnimations.map(a => a.key));
-  setTimeout(() => {
-    evictUntouched(touchedThisTurn);
-  }, 1500);
 }
 
     previousBlocks = currentBlocks;
