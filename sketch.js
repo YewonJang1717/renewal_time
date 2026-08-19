@@ -657,23 +657,33 @@ document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP)
     if (currentTitle !== rightTitle.textContent.trim()) rightTitle.textContent = currentTitle;
 
        const currentBlocks = extractBlocks(leftBody);
+const currentIds = new Set(currentBlocks.map(b => b.id));
+Array.from(revealedMap.keys()).forEach(key => {
+  const blockId = key.split('-')[0];
+  if (!currentIds.has(blockId)) revealedMap.delete(key);
+});
+Array.from(revealedStructuralIds).forEach(id => {
+  if (!currentIds.has(id)) revealedStructuralIds.delete(id);
+});
 const prevById = new Map(previousBlocks.map(b => [b.id, b]));
 const previousSentenceTexts = new Set();
 previousBlocks.forEach(b => { if (b.type === 'paragraph') b.sentences.forEach(s => previousSentenceTexts.add(s)); });
 let anyChange = false;
 const sentenceAnimations = [];
 const deletedSentences = [];
+const touchedStructuralThisTurn = new Set();
 
         currentBlocks.forEach(block => {
       if (block.type !== 'paragraph') {
         const prevBlock = prevById.get(block.id);
         const isNew = !prevBlock;
         const isChanged = prevBlock && JSON.stringify(prevBlock) !== JSON.stringify(block);
-        if (isNew || isChanged) {
-          revealedStructuralIds.add(block.id);
-          anyChange = true;
-        }
-        return;
+            if (isNew || isChanged) {
+      revealedStructuralIds.add(block.id);
+      touchedStructuralThisTurn.add(block.id);
+      anyChange = true;
+    }
+    return;
       }
       const prevBlock = prevById.get(block.id);
       const oldSentences = prevBlock && prevBlock.type === 'paragraph' ? prevBlock.sentences : [];
@@ -701,8 +711,11 @@ const deletedSentences = [];
     if (currentBlocks.length !== previousBlocks.length) anyChange = true;
 
           if (anyChange) {
-  const touchedThisTurn = new Set(sentenceAnimations.map(a => a.key));
+    const touchedThisTurn = new Set(sentenceAnimations.map(a => a.key));
   evictUntouched(touchedThisTurn); // 이번 턴 이전에 남아있던 것들을 먼저 정리
+  Array.from(revealedStructuralIds).forEach(id => {
+    if (!touchedStructuralThisTurn.has(id)) revealedStructuralIds.delete(id);
+  });
   const animatingInit = new Map(sentenceAnimations.map(a => [a.key, a.oldDisplayed]));
   renderRightBody(currentBlocks, animatingInit);
   refreshFlash(document.getElementById('flash-right'));
