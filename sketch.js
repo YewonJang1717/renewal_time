@@ -10,10 +10,10 @@ function goTo(name) {
   screens[name].classList.add('active');
   updateActiveTab(name);
 
-      if (name === 'explain') {
+       if (name === 'explain') {
     document.getElementById('explain-scroll').scrollTop = 0;
     playIntroHeadingAnimation();
-    replayAllPageAnimations();
+    playFirstPageFade();
     const toast = document.getElementById('scroll-toast');
     toast.classList.add('show');
     clearTimeout(goTo._toastTimer);
@@ -84,7 +84,6 @@ explainParagraphs.forEach((paragraph, pIndex) => {
         chunks.forEach((chunk, i) => {
       const box = document.createElement('div');
       box.className = 'explain-freeform-box box-' + (i + 1) + ' fade-up-target';
-      if (i === 1) box.style.transitionDelay = '0.25s'; // 오른쪽(2번) 박스가 조금 더 늦게
       const p = document.createElement('p');
       p.textContent = chunk;
       box.appendChild(p);
@@ -155,26 +154,6 @@ function playIntroHeadingAnimation() {
   );
 }
 
-function replayAllPageAnimations() {
-  const pages = document.querySelectorAll('.explain-page');
-  pages.forEach(page => {
-    page.classList.remove('revealed');
-    page.querySelectorAll('.fade-up-target').forEach(el => el.classList.remove('in'));
-  });
-
-  const firstPage = pages[0];
-  if (firstPage) {
-    const targets = firstPage.querySelectorAll('.fade-up-target');
-    targets.forEach(el => { void el.offsetWidth; }); 
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        firstPage.classList.add('revealed');
-        targets.forEach(el => el.classList.add('in'));
-      });
-    });
-  }
-}
 
 const scrollHint = document.getElementById('scroll-hint');
 explainScroll.addEventListener('scroll', () => {
@@ -183,15 +162,32 @@ explainScroll.addEventListener('scroll', () => {
 });
 
 const explainPages = document.querySelectorAll('.explain-page');
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('revealed');
-      entry.target.querySelectorAll('.fade-up-target').forEach(el => el.classList.add('in'));
+
+explainPages.forEach((page, pageIdx) => {
+  if (pageIdx === 0) return; // 첫 페이지는 아래에서 따로 처리
+  const targets = page.querySelectorAll('.fade-up-target');
+  if (!targets.length) return;
+
+  gsap.fromTo(targets,
+    { opacity: 0, y: 36 },
+    {
+      opacity: 1, y: 0, duration: 1.1, ease: 'power1.out', stagger: 0.25,
+      scrollTrigger: { trigger: page, scroller: '#explain-scroll', start: 'top 60%', toggleActions: 'play none none reverse' }
     }
-  });
-}, { threshold: 0.4 });
-explainPages.forEach(page => revealObserver.observe(page));
+  );
+});
+
+// 첫 페이지는 스크롤로 진입하는 게 아니라 항상 화면에 떠 있는 상태로 시작하니,
+// 설명 화면에 들어갈 때마다 이 함수를 직접 호출해서 재생
+function playFirstPageFade() {
+  const firstPage = explainPages[0];
+  if (!firstPage) return;
+  const targets = firstPage.querySelectorAll('.fade-up-target');
+  gsap.fromTo(targets,
+    { opacity: 0, y: 28 },
+    { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', stagger: 0.1 }
+  );
+}
 
 // 3번째 페이지(새로고침 예시) 도착 시 진짜 새로고침 + 그 페이지로 복귀 + 문장 추가
 const refreshDemoPage = explainPages[2];
