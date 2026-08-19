@@ -274,6 +274,7 @@ panelRight.addEventListener('mouseenter', () => setActivePanel(panelRight));
 experienceStage.addEventListener('mouseleave', () => setActivePanel(null));
 
 // ---------- 체험 화면: 자유 항목 + 표 추가/삭제 + 위치 고정 1문장 표시 ----------
+// ---------- 체험 화면: 자유 항목 + 표 추가/삭제 + 내용 기반 diff ----------
 const leftTitle = document.getElementById('left-title');
 const leftBody = document.getElementById('left-body');
 const editBtn = document.getElementById('edit-toggle-btn');
@@ -284,17 +285,6 @@ const rightBody = document.getElementById('right-body');
 
 let isEditing = false;
 let version = 1.0;
-let touchCounter = 0;
-
-const revealedMap = new Map();
-const revealedStructuralIds = new Set();
-let blockIdCounter = 0;
-function getBlockId(node) {
-  if (node.dataset.blockId) return node.dataset.blockId;
-  const id = 'b' + (blockIdCounter++);
-  node.dataset.blockId = id;
-  return id;
-}
 
 function splitSentences(text) {
   return text.trim().split(/(?<=[.?!])\s+/).filter(s => s.trim().length > 0);
@@ -314,6 +304,7 @@ function simpleWordDiff(oldText, newText) {
     after: oldWords.slice(oldEnd).join('')
   };
 }
+
 function escapeHtml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
@@ -331,7 +322,6 @@ function animateSentenceReplace(span, oldText, newText) {
   const newMiddle = newText.slice(p, newText.length - s);
   const suffix = oldText.slice(oldText.length - s);
 
-    // 1단계: 바뀐 부분(oldMiddle)만 빨간색으로 표시하고, 잠깐 멈춰서 눈에 담기게 함
   span.innerHTML = escapeHtml(prefix) +
     (oldMiddle ? '<span class="diff-removed">' + escapeHtml(oldMiddle) + '</span>' : '') +
     escapeHtml(suffix);
@@ -356,20 +346,18 @@ function animateSentenceReplace(span, oldText, newText) {
       return;
     }
     j++;
-    // 2단계: 새로 채워지는 부분(newMiddle)은 초록색으로 표시
     span.innerHTML = escapeHtml(prefix) +
       '<span class="diff-added">' + escapeHtml(newMiddle.slice(0, j)) + '</span>' +
       escapeHtml(suffix);
     if (j < newMiddle.length) {
       setTimeout(typeNew, 45);
     } else {
-      // 3단계: 잠깐 뒤 색이 빠지고 완전히 정착
       setTimeout(() => { span.textContent = newText; }, 500);
     }
   }
 
-    if (oldMiddle.length > 0) {
-    setTimeout(backspace, 500); // 빨간색이 눈에 들어올 시간을 0.5초 줌
+  if (oldMiddle.length > 0) {
+    setTimeout(backspace, 500);
   } else {
     typeNew();
   }
@@ -445,7 +433,7 @@ function ensureTableRemoveButton(table) {
     table.parentNode.insertBefore(wrap, table);
     wrap.appendChild(table);
   }
-  if (wrap.querySelector('.table-remove-btn')) return; // 버튼이 이미 있으면 중복 부착 방지
+  if (wrap.querySelector('.table-remove-btn')) return;
 
   const removeBtn = document.createElement('button');
   removeBtn.className = 'table-remove-btn';
@@ -508,18 +496,17 @@ addTableBtn.addEventListener('click', () => {
   table.querySelector('td').focus();
 });
 
-function extractBlocks(bodyEl) {
+// ---------- 내용 기반 스냅샷 (DOM 꼬리표 없이, 순수 데이터로만) ----------
+function snapshotBlocks(bodyEl) {
   const blocks = [];
   Array.from(bodyEl.children).forEach(el => {
     if (el.classList && el.classList.contains('wiki-subheading1')) {
-      const textEl = el.querySelector('.heading-text');
-      blocks.push({ id: getBlockId(el), type: 'heading1', text: (textEl || el).textContent.trim() });
+      blocks.push({ type: 'heading1', text: el.querySelector('.heading-text').textContent.trim() });
     } else if (el.classList && el.classList.contains('wiki-subheading2')) {
-      const textEl = el.querySelector('.heading-text');
-      blocks.push({ id: getBlockId(el), type: 'heading2', text: (textEl || el).textContent.trim() });
-        } else if (el.tagName === 'P' && !el.classList.contains('wiki-notice')) {
+      blocks.push({ type: 'heading2', text: el.querySelector('.heading-text').textContent.trim() });
+    } else if (el.tagName === 'P' && !el.classList.contains('wiki-notice')) {
       const text = el.textContent.trim();
-      if (text) blocks.push({ id: getBlockId(el), type: 'paragraph', sentences: splitSentences(text) });
+      if (text) blocks.push({ type: 'paragraph', sentences: splitSentences(text) });
     } else if (el.classList && el.classList.contains('table-block')) {
       const table = el.querySelector('table');
       if (!table) return;
@@ -527,12 +514,172 @@ function extractBlocks(bodyEl) {
         const tds = Array.from(tr.querySelectorAll('td'));
         return { label: tds[0] ? tds[0].textContent.trim() : '', value: tds[1] ? tds[1].textContent.trim() : '' };
       });
-      blocks.push({ id: getBlockId(el), type: 'table', rows });
+      blocks.push({ type: 'table', rows });
     }
   });
   return blocks;
 }
 
+// 블록을 "같은 블록인지" 판단하는 기준값
+function blockKey(b) {
+  if (b.type === 'heading1') return 'h1:' + b.text;
+  if (b.type === 'heading2') return 'h2:' + b.text;
+  if (b.type === 'table') return 'table:' + JSON.stringify(b.rows);
+  if (b.type === 'paragraph') return 'p:' + (b.sentences[0] || ''); // 문단의 첫 문장으로 정체성 판단
+  return '';
+}
+
+// LCS 기반 시퀀스 비교: 문서 전체를 위키피디아 편집 이력 비교하듯 훑음
+function computeLCSDiff(oldArr, newArr) {
+  const oldKeys = oldArr.map(blockKey);
+  const newKeys = newArr.map(blockKey);
+  const m = oldKeys.length, n = newKeys.length;
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = m - 1; i >= 0; i--) {
+    for (let j = n - 1; j >= 0; j--) {
+      dp[i][j] = oldKeys[i] === newKeys[j] ? dp[i+1][j+1] + 1 : Math.max(dp[i+1][j], dp[i][j+1]);
+    }
+  }
+  const result = [];
+  let i = 0, j = 0;
+  while (i < m && j < n) {
+    if (oldKeys[i] === newKeys[j]) {
+      result.push({ type: 'same', oldItem: oldArr[i], newItem: newArr[j] });
+      i++; j++;
+    } else if (dp[i+1][j] >= dp[i][j+1]) {
+      result.push({ type: 'removed', oldItem: oldArr[i] });
+      i++;
+    } else {
+      result.push({ type: 'added', newItem: newArr[j] });
+      j++;
+    }
+  }
+  while (i < m) { result.push({ type: 'removed', oldItem: oldArr[i] }); i++; }
+  while (j < n) { result.push({ type: 'added', newItem: newArr[j] }); j++; }
+  return result;
+}
+
+// diff 결과를 오른쪽 화면에 그리고, 애니메이션까지 재생
+function renderDiffAndAnimate(oldBlocks, newBlocks, opts) {
+  opts = opts || {};
+  const diffOps = computeLCSDiff(oldBlocks, newBlocks);
+
+  rightBody.innerHTML = '';
+  const animations = [];
+  const removals = [];
+
+  diffOps.forEach(op => {
+    if (op.type === 'removed') {
+      if (op.oldItem.type === 'paragraph') {
+        const p = document.createElement('p');
+        op.oldItem.sentences.forEach(s => {
+          const span = document.createElement('span');
+          span.className = 'sentence';
+          span.textContent = s;
+          p.appendChild(span);
+          p.appendChild(document.createTextNode(' '));
+          removals.push({ span, text: s });
+        });
+        rightBody.appendChild(p);
+      }
+      return;
+    }
+
+    if (op.type === 'added') {
+      const b = op.newItem;
+      if (b.type === 'heading1' || b.type === 'heading2') {
+        rightBody.appendChild(makeHeadingDiv(b.text, b.type === 'heading1' ? 1 : 2));
+      } else if (b.type === 'paragraph') {
+        const p = document.createElement('p');
+        b.sentences.forEach(s => {
+          const span = document.createElement('span');
+          span.className = 'sentence hidden';
+          p.appendChild(span);
+          p.appendChild(document.createTextNode(' '));
+          animations.push({ span, oldText: '', newText: s });
+        });
+        rightBody.appendChild(p);
+      } else if (b.type === 'table') {
+        const wrap = document.createElement('div');
+        wrap.className = 'table-block';
+        const table = document.createElement('table');
+        table.className = 'wiki-table';
+        b.rows.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td class="label">${escapeHtml(row.label)}</td><td>${escapeHtml(row.value)}</td>`;
+          table.appendChild(tr);
+        });
+        wrap.appendChild(table);
+        rightBody.appendChild(wrap);
+      }
+      return;
+    }
+
+    // same
+    const b = op.newItem;
+    if (b.type === 'heading1' || b.type === 'heading2') {
+      const div = makeHeadingDiv(b.text, b.type === 'heading1' ? 1 : 2);
+      div.classList.add('hidden');
+      rightBody.appendChild(div);
+    } else if (b.type === 'table') {
+      const wrap = document.createElement('div');
+      wrap.className = 'table-block hidden';
+      const table = document.createElement('table');
+      table.className = 'wiki-table';
+      b.rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="label">${escapeHtml(row.label)}</td><td>${escapeHtml(row.value)}</td>`;
+        table.appendChild(tr);
+      });
+      wrap.appendChild(table);
+      rightBody.appendChild(wrap);
+    } else if (b.type === 'paragraph') {
+      const oldSentences = op.oldItem.sentences;
+      const newSentences = b.sentences;
+      const p = document.createElement('p');
+      const maxLen = Math.max(oldSentences.length, newSentences.length);
+      for (let k = 0; k < maxLen; k++) {
+        const oldS = oldSentences[k] || '';
+        const newS = newSentences[k] || '';
+        const span = document.createElement('span');
+        span.className = 'sentence';
+        if (oldS === newS) {
+          span.classList.add('hidden');
+          span.textContent = newS;
+        } else if (newS) {
+          span.classList.add('hidden');
+          animations.push({ span, oldText: oldS, newText: newS });
+        } else {
+          span.textContent = oldS;
+          removals.push({ span, text: oldS });
+        }
+        p.appendChild(span);
+        p.appendChild(document.createTextNode(' '));
+      }
+      rightBody.appendChild(p);
+    }
+  });
+
+  renumberHeadings(rightBody);
+
+  if (!opts.silent) {
+    refreshFlash(document.getElementById('flash-right'));
+    version += 0.1;
+    rightVersion.textContent = 'ver. ' + version.toFixed(1);
+  }
+
+  animations.forEach(({ span, oldText, newText }) => {
+    span.classList.remove('hidden');
+    animateSentenceReplace(span, oldText, newText);
+  });
+
+  removals.forEach(({ span, text }) => {
+    animateSentenceReplace(span, text, '');
+    setTimeout(() => { span.remove(); }, 1600);
+  });
+}
+
+// ---------- 저장/불러오기 (이제 순수 텍스트/HTML만 저장하면 충분해요) ----------
 const STORAGE_KEY = 'renewalTimeWikiState';
 
 function getCleanBodyHTML() {
@@ -546,13 +693,9 @@ function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       title: leftTitle.textContent,
       html: getCleanBodyHTML(),
-      version: version,
-      blockIdCounter: blockIdCounter,
-      touchCounter: touchCounter,
-      revealed: Array.from(revealedMap.entries()),
-      revealedStructural: Array.from(revealedStructuralIds)
+      version: version
     }));
-  } catch (e) { /* 저장 실패해도 사이트는 계속 작동해야 하니 조용히 무시 */ }
+  } catch (e) { /* 저장 실패해도 조용히 무시 */ }
 }
 
 function loadState() {
@@ -565,10 +708,6 @@ function loadState() {
     rightTitle.textContent = state.title;
     version = state.version || 1.0;
     rightVersion.textContent = 'ver. ' + version.toFixed(1);
-    blockIdCounter = state.blockIdCounter || 0;
-    touchCounter = state.touchCounter || 0;
-    (state.revealed || []).forEach(([key, val]) => revealedMap.set(key, val));
-    (state.revealedStructural || []).forEach(id => revealedStructuralIds.add(id));
     leftBody.querySelectorAll('table.wiki-table').forEach(ensureTableRemoveButton);
     return true;
   } catch (e) {
@@ -577,68 +716,32 @@ function loadState() {
 }
 
 loadState();
-let previousBlocks = extractBlocks(leftBody);
+let previousBlocks = snapshotBlocks(leftBody);
+renderDiffAndAnimate(previousBlocks, previousBlocks, { silent: true }); // 초기 상태: 전부 배경색
 
-function renderRightBody(blocks, animatingInit) {
-  animatingInit = animatingInit || new Map();
-  rightBody.innerHTML = '';
-  blocks.forEach(block => {
-    if (block.type === 'heading1' || block.type === 'heading2') {
-      const headingDiv = makeHeadingDiv(block.text, block.type === 'heading1' ? 1 : 2);
-      if (!revealedStructuralIds.has(block.id)) headingDiv.classList.add('hidden');
-      rightBody.appendChild(headingDiv);
-    } else if (block.type === 'paragraph') {
-      const p = document.createElement('p');
-      p.dataset.blockId = block.id;
-      block.sentences.forEach((s, i) => {
-        const key = block.id + '-' + i;
-        const span = document.createElement('span');
-        span.className = 'sentence' + (revealedMap.has(key) ? '' : ' hidden');
-        span.dataset.key = key;
-        span.textContent = animatingInit.has(key) ? animatingInit.get(key) : s;
-        p.appendChild(span);
-        p.appendChild(document.createTextNode(' '));
-      });
-      rightBody.appendChild(p);
-    }
-  });
-  renumberHeadings(rightBody);
-}
-renderRightBody(previousBlocks);
-renumberHeadings(leftBody);
-
-function evictUntouched(keepKeys) {
-  Array.from(revealedMap.keys()).forEach(key => {
-    if (!keepKeys.has(key)) {
-      revealedMap.delete(key);
-      const span = rightBody.querySelector(`.sentence[data-key="${key}"]`);
-      if (span) { span.classList.add('hidden'); span.classList.remove('diff-removed', 'diff-added'); }
-    }
-  });
-}
 editBtn.addEventListener('click', () => {
   if (!isEditing) {
     isEditing = true;
     leftBody.classList.add('is-editing');
     const guideP = document.createElement('p');
-guideP.className = 'wiki-edit-guide';
-guideP.id = 'wiki-edit-guide';
-guideP.innerHTML = '대분류: <code>=내용=</code> → 1, 2, 3 ...<br>하위항목: <code>-내용-</code> → 1.1, 1.2 ...';
-document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP);
+    guideP.className = 'wiki-edit-guide';
+    guideP.id = 'wiki-edit-guide';
+    guideP.innerHTML = '대분류: <code>=내용=</code> → 1, 2, 3 ...<br>하위항목: <code>-내용-</code> → 1.1, 1.2 ...';
+    document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP);
     editBtn.textContent = '완료';
     editBtn.classList.add('done');
     addTableBtn.style.display = 'inline-block';
     leftTitle.setAttribute('contenteditable', 'true');
-        leftBody.querySelectorAll('p:not(.wiki-notice), .heading-text').forEach(el => el.setAttribute('contenteditable', 'true'));
+    leftBody.querySelectorAll('p:not(.wiki-notice), .heading-text').forEach(el => el.setAttribute('contenteditable', 'true'));
     leftBody.querySelectorAll('td:not(.row-controls)').forEach(td => td.setAttribute('contenteditable', 'true'));
     leftBody.setAttribute('contenteditable', 'true');
-        previousBlocks = extractBlocks(leftBody);
-    revealedMap.clear();
-    renderRightBody(previousBlocks);
+
+    previousBlocks = snapshotBlocks(leftBody);
+    renderDiffAndAnimate(previousBlocks, previousBlocks, { silent: true }); // 편집 시작 즉시 전부 배경색으로
     leftTitle.focus();
   } else {
     isEditing = false;
-     document.getElementById('wiki-edit-guide')?.remove();
+    document.getElementById('wiki-edit-guide')?.remove();
     leftBody.classList.remove('is-editing');
     editBtn.textContent = '편집';
     editBtn.classList.remove('done');
@@ -656,89 +759,16 @@ document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP)
     const currentTitle = leftTitle.textContent.trim();
     if (currentTitle !== rightTitle.textContent.trim()) rightTitle.textContent = currentTitle;
 
-       const currentBlocks = extractBlocks(leftBody);
-const currentIds = new Set(currentBlocks.map(b => b.id));
-Array.from(revealedMap.keys()).forEach(key => {
-  const blockId = key.split('-')[0];
-  if (!currentIds.has(blockId)) revealedMap.delete(key);
-});
-Array.from(revealedStructuralIds).forEach(id => {
-  if (!currentIds.has(id)) revealedStructuralIds.delete(id);
-});
-const prevById = new Map(previousBlocks.map(b => [b.id, b]));
-const previousSentenceTexts = new Set();
-previousBlocks.forEach(b => { if (b.type === 'paragraph') b.sentences.forEach(s => previousSentenceTexts.add(s)); });
-let anyChange = false;
-const sentenceAnimations = [];
-const deletedSentences = [];
-const touchedStructuralThisTurn = new Set();
-
-        currentBlocks.forEach(block => {
-      if (block.type !== 'paragraph') {
-        const prevBlock = prevById.get(block.id);
-        const isNew = !prevBlock;
-        const isChanged = prevBlock && JSON.stringify(prevBlock) !== JSON.stringify(block);
-            if (isNew || isChanged) {
-      revealedStructuralIds.add(block.id);
-      touchedStructuralThisTurn.add(block.id);
-      anyChange = true;
+    const newBlocks = snapshotBlocks(leftBody);
+    const anyChange = JSON.stringify(previousBlocks) !== JSON.stringify(newBlocks);
+    if (anyChange) {
+      renderDiffAndAnimate(previousBlocks, newBlocks);
     }
-    return;
-      }
-      const prevBlock = prevById.get(block.id);
-      const oldSentences = prevBlock && prevBlock.type === 'paragraph' ? prevBlock.sentences : [];
-      const maxLen = Math.max(oldSentences.length, block.sentences.length);
-                for (let i = 0; i < maxLen; i++) {
-        const oldS = oldSentences[i] || '';
-        const newS = block.sentences[i] || '';
-            if (oldS === newS) continue;
-    if (newS && previousSentenceTexts.has(newS)) continue; // 쪼개짐으로 인한 가짜 "새 문장" 무시
-    anyChange = true;
-    const key = block.id + '-' + i;
-    const previouslyDisplayed = revealedMap.has(key) ? revealedMap.get(key).text : oldS;
-
-    if (newS) {
-          sentenceAnimations.push({ key, oldDisplayed: previouslyDisplayed, newText: newS });
-          touchCounter++;
-          revealedMap.set(key, { text: newS, lastTouched: touchCounter });
-        } else {
-          deletedSentences.push({ blockId: block.id, oldDisplayed: previouslyDisplayed });
-          revealedMap.delete(key);
-        }
-      }
-    });
-
-    if (currentBlocks.length !== previousBlocks.length) anyChange = true;
-
-          if (anyChange) {
-    const touchedThisTurn = new Set(sentenceAnimations.map(a => a.key));
-  evictUntouched(touchedThisTurn); // 이번 턴 이전에 남아있던 것들을 먼저 정리
-  Array.from(revealedStructuralIds).forEach(id => {
-    if (!touchedStructuralThisTurn.has(id)) revealedStructuralIds.delete(id);
-  });
-  const animatingInit = new Map(sentenceAnimations.map(a => [a.key, a.oldDisplayed]));
-  renderRightBody(currentBlocks, animatingInit);
-  refreshFlash(document.getElementById('flash-right'));
-  version += 0.1;
-  rightVersion.textContent = 'ver. ' + version.toFixed(1);
-
-  sentenceAnimations.forEach(({ key, oldDisplayed, newText }) => {
-    const span = rightBody.querySelector(`.sentence[data-key="${key}"]`);
-    if (span) animateSentenceReplace(span, oldDisplayed, newText);
-  });
-
-  // 완전히 삭제된 문장: 그 문단 끝에 잠깐 나타났다가 지워지는 유령 문장으로 표시
-  deletedSentences.forEach(({ blockId, oldDisplayed }) => {
-    const p = rightBody.querySelector(`p[data-block-id="${blockId}"]`);
-    if (!p) return;
-    const ghost = document.createElement('span');
-    ghost.className = 'sentence';
-    p.appendChild(ghost);
-    animateSentenceReplace(ghost, oldDisplayed, '');
-  });
-}
-
-    previousBlocks = currentBlocks;
+    previousBlocks = newBlocks;
     saveState();
   }
+});
+
+document.getElementById('edit-guide-confirm-btn').addEventListener('click', () => {
+  document.getElementById('edit-guide-overlay')?.classList.remove('show');
 });
