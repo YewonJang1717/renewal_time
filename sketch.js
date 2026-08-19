@@ -289,11 +289,12 @@ const MAX_REVEALED = 1; // 여기 숫자만 바꾸면 몇 개까지 남길지 �
 
 const revealedMap = new Map();
 const revealedStructuralIds = new Set();
-const blockIdMap = new WeakMap();
 let blockIdCounter = 0;
 function getBlockId(node) {
-  if (!blockIdMap.has(node)) blockIdMap.set(node, 'b' + (blockIdCounter++));
-  return blockIdMap.get(node);
+  if (node.dataset.blockId) return node.dataset.blockId;
+  const id = 'b' + (blockIdCounter++);
+  node.dataset.blockId = id;
+  return id;
 }
 
 function splitSentences(text) {
@@ -438,11 +439,14 @@ function ensureRowControls(table) {
 
 function ensureTableRemoveButton(table) {
   ensureRowControls(table);
-  if (table.parentElement && table.parentElement.classList.contains('table-block')) return;
-  const wrap = document.createElement('div');
-  wrap.className = 'table-block';
-  table.parentNode.insertBefore(wrap, table);
-  wrap.appendChild(table);
+  let wrap = table.parentElement;
+  if (!wrap || !wrap.classList.contains('table-block')) {
+    wrap = document.createElement('div');
+    wrap.className = 'table-block';
+    table.parentNode.insertBefore(wrap, table);
+    wrap.appendChild(table);
+  }
+  if (wrap.querySelector('.table-remove-btn')) return; // 버튼이 이미 있으면 중복 부착 방지
 
   const removeBtn = document.createElement('button');
   removeBtn.className = 'table-remove-btn';
@@ -530,6 +534,50 @@ function extractBlocks(bodyEl) {
   return blocks;
 }
 
+const STORAGE_KEY = 'renewalTimeWikiState';
+
+function getCleanBodyHTML() {
+  const clone = leftBody.cloneNode(true);
+  clone.querySelectorAll('.table-remove-btn, .row-add-btn, .row-controls').forEach(el => el.remove());
+  return clone.innerHTML;
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      title: leftTitle.textContent,
+      html: getCleanBodyHTML(),
+      version: version,
+      blockIdCounter: blockIdCounter,
+      touchCounter: touchCounter,
+      revealed: Array.from(revealedMap.entries()),
+      revealedStructural: Array.from(revealedStructuralIds)
+    }));
+  } catch (e) { /* 저장 실패해도 사이트는 계속 작동해야 하니 조용히 무시 */ }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+    leftTitle.textContent = state.title;
+    leftBody.innerHTML = state.html;
+    rightTitle.textContent = state.title;
+    version = state.version || 1.0;
+    rightVersion.textContent = 'ver. ' + version.toFixed(1);
+    blockIdCounter = state.blockIdCounter || 0;
+    touchCounter = state.touchCounter || 0;
+    (state.revealed || []).forEach(([key, val]) => revealedMap.set(key, val));
+    (state.revealedStructural || []).forEach(id => revealedStructuralIds.add(id));
+    leftBody.querySelectorAll('table.wiki-table').forEach(ensureTableRemoveButton);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+loadState();
 let previousBlocks = extractBlocks(leftBody);
 
 function renderRightBody(blocks) {
@@ -665,28 +713,33 @@ document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP)
     if (currentBlocks.length !== previousBlocks.length) anyChange = true;
 
           if (anyChange) {
-      evictIfNeeded();
-      renderRightBody(currentBlocks);
-      refreshFlash(document.getElementById('flash-right'));
-      version += 0.1;
-      rightVersion.textContent = 'ver. ' + version.toFixed(1);
+  renderRightBody(currentBlocks);
+  refreshFlash(document.getElementById('flash-right'));
+  version += 0.1;
+  rightVersion.textContent = 'ver. ' + version.toFixed(1);
 
-      sentenceAnimations.forEach(({ key, oldDisplayed, newText }) => {
-        const span = rightBody.querySelector(`.sentence[data-key="${key}"]`);
-        if (span) animateSentenceReplace(span, oldDisplayed, newText);
-      });
+  sentenceAnimations.forEach(({ key, oldDisplayed, newText }) => {
+    const span = rightBody.querySelector(`.sentence[data-key="${key}"]`);
+    if (span) animateSentenceReplace(span, oldDisplayed, newText);
+  });
 
-      // 완전히 삭제된 문장: 그 문단 끝에 잠깐 나타났다가 지워지는 유령 문장으로 표시
-      deletedSentences.forEach(({ blockId, oldDisplayed }) => {
-        const p = rightBody.querySelector(`p[data-block-id="${blockId}"]`);
-        if (!p) return;
-        const ghost = document.createElement('span');
-        ghost.className = 'sentence';
-        p.appendChild(ghost);
-        animateSentenceReplace(ghost, oldDisplayed, '');
-      });
-    }
+  // 완전히 삭제된 문장: 그 문단 끝에 잠깐 나타났다가 지워지는 유령 문장으로 표시
+  deletedSentences.forEach(({ blockId, oldDisplayed }) => {
+    const p = rightBody.querySelector(`p[data-block-id="${blockId}"]`);
+    if (!p) return;
+    const ghost = document.createElement('span');
+    ghost.className = 'sentence';
+    p.appendChild(ghost);
+    animateSentenceReplace(ghost, oldDisplayed, '');
+  });
+
+  // 애니메이션이 다 끝난 뒤에야 "1개만 남기기" 규칙 적용
+  setTimeout(() => {
+    evictIfNeeded();
+  }, 1500);
+}
 
     previousBlocks = currentBlocks;
+    saveState();
   }
 });
