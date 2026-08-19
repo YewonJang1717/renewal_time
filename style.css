@@ -46,7 +46,6 @@ html, body {
 }
 .main-inner {
   text-align: center;
-  transform: translateY(-6vh);
 }
 .main-title {
   font-size: clamp(40px, 7vw, 80px);
@@ -149,12 +148,13 @@ html, body {
 }
 
 .explain-body {
+  max-width: 480px;
   margin-left: auto;
-  max-width: 520px;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.9;
   color: var(--light-text);
-  white-space: pre-wrap;
+  word-break: keep-all;
+  text-align: justify;
 }
 .explain-body span.word {
   display: inline-block;
@@ -451,6 +451,7 @@ html, body {
   color: var(--light-text);
   word-break: keep-all;
   white-space: pre-wrap;
+  text-align: justify;
 }
 
 /* 첫 번째 이미지 ("갱신되는 시간") 배치 */
