@@ -34,14 +34,13 @@ function updateActiveTab(name) {
 
 // ---------- 설명 화면 ----------
 const explainParagraphs = [
-  "  오늘날 우리는 디지털 환경에서 많은 시간을 보낸다. 그 속에서 5년, 10년, 20년, 또는 그보다도 더 된 과거의 기록들을 마주하기도 한다. 그럴 때 우리는 디지털 기록에서 영원을 느낀다. 우리가 죽어도, 우리의 다음 세대가 죽어도, 우리의 기록은 이 인터넷 세계에 똑같이 남아있는 게 아닐까? 그러나 동시에 디지털 기록은 어쩌면, 아날로그보다 훨씬 연약한 것일 수 있다. 우리가 남긴 기록은 우리가 눈 한 번 깜빡하는 사이 완전히 다른 내용으로 바뀌어 있을지도 모른다.<br>  웹은 갱신된다. 이 작업에서, 우리는 그렇게 정의했다. 그 갱신이란 건 무엇일까? 비물질적인 매체인 웹에는 어떻게 시간의 흔적이 남고 있는 것일까?",
-  "  네이버 국어사전에 따르면, 갱신이란 단어는 '이미 있던 것을 고쳐 새롭게 하다', '기존의 내용을 변동된 사실에 따라 변경ㆍ추가ㆍ삭제하는 일'이라는 의미를 갖고 있다. 종이에 인쇄된 내용은 변하지 않는다. 물론 찢어지고, 물에 젖고, 불에 타는 등의 변화는 일어난다. 하지만 그것은 종이라는 매체에 일어나는 변화일 뿐, 내용에 일어나는 변화가 아니다. \n  웹에서는 다르다. 이미 완성해 배포한 웹이라도, 코드를 조금 수정하면 순식간에 디자인을 바꿀 수 있다. 배경색을 바꾸는 것도, 새로운 사진을 넣는 것도, 글을 조금 삭제하는 것도 너무 간단한 일이다. 웹에서는 매체 뿐만 아니라 내용도 변화를 겪는다. 변경되고, 추가되고, 삭제된다. 그래서 우리는 웹이 갱신된다고 한다.",
+  "  오늘날 우리는 디지털 환경에서 많은 시간을 보낸다. 그 속에서 5년, 10년, 20년, 또는 그보다도 더 된 과거의 기록들을 마주하기도 한다. 그럴 때 우리는 디지털 기록에서 영원을 느낀다. 우리가 죽어도, 우리의 다음 세대가 죽어도, 우리의 기록은 이 인터넷 세계에 똑같이 남아있는 게 아닐까? 그러나 동시에 디지털 기록은 어쩌면, 아날로그보다 훨씬 연약한 것일 수 있다. 우리가 남긴 기록은 우리가 눈 한 번 깜빡하는 사이 완전히 다른 내용으로 바뀌어 있을지도 모른다.<br><br>  웹은 갱신된다. 이 작업에서, 우리는 그렇게 정의했다. 그 갱신이란 건 무엇일까? 비물질적인 매체인 웹에는 어떻게 시간의 흔적이 남고 있는 것일까?",
+  "  네이버 국어사전에 따르면, 갱신이란 단어는 '이미 있던 것을 고쳐 새롭게 하다', '기존의 내용을 변동된 사실에 따라 변경ㆍ추가ㆍ삭제하는 일'이라는 의미를 갖고 있다. 종이에 인쇄된 내용은 변하지 않는다. 물론 찢어지고, 물에 젖고, 불에 타는 등의 변화는 일어난다. 하지만 그것은 종이라는 매체에 일어나는 변화일 뿐, 내용에 일어나는 변화가 아니다. \n\n  웹에서는 다르다. 이미 완성해 배포한 웹이라도, 코드를 조금 수정하면 순식간에 디자인을 바꿀 수 있다. 배경색을 바꾸는 것도, 새로운 사진을 넣는 것도, 글을 조금 삭제하는 것도 너무 간단한 일이다. 웹에서는 매체 뿐만 아니라 내용도 변화를 겪는다. 변경되고, 추가되고, 삭제된다. 그래서 우리는 웹이 갱신된다고 한다.",
   "  우리는 어떨 때 웹에서 갱신을 경험할까? 일상적인 예시로는 새로고침에 의한 갱신이 있다. 유튜브, 인스타그램, 뉴스 사이트 등··· 많은 웹에서 흔히 마주할 수 있다.",
   "  또다른 예시로는 덮어쓰기가 있다. 글의 내용이, 이미지가, 어떨 땐 사이트 자체가 통째로 덮어씌워져 아예 다른 무언가가 되어버린다. 업데이트도 이와 비슷한 방식으로 이루어진다. 이전의 버전이 새로운 버전으로 덮어씌워진다.",
   "  예전에 본 적 있는 사이트에 404 error가 뜨며 접속이 불가능하게 된 경험이 있을 것이다. 화면에 남은 건 오류 메시지 뿐이지만, 이 역시 기존의 기록이 삭제되었다는 점에서 갱신으로 볼 수 있다.",
-  "   이 웹사이트는 갱신을 테마로 한다. 우리는 갱신을 특징으로 하는 웹의 형태 중 위키를 선택했다. 이유는 간단하다. 누구나 위키를 알고 있기 때문이다. 편집을 해본 적은 없더라도, 위키에 있는 정보를 마주한 경험은 누구나 있을 것이다. 그리고 위키 문서를 보다가 저번에 봤을 때와 내용이 조금 달라진 것을 눈치챈 적이 있는 사람도 분명 많을 것이다. 갱신되었음을 체감하는 순간이다. \n  ‘경험하는 시간’ 탭은 간단히 설명하면 체험 화면이다. ‘경험하는 시간’에서 관객은 위키 문서의 글을 자유롭게 수정할 수 있다. 내용을 추가할 수도 있고, 완전히 다른 내용으로 덮어씌울 수도 있다. 그것만으로도 이미 갱신을 경험할 수 있지만, 이 웹은 거기서 한 발짝 더 나아간다. 우측 패널에 방금 수정된 문장만을 띄우는 것이다. 가장 최근의 기록만을 보여주는 우측 패널은 끊임없이 갱신되는 웹의 현재성을 강조한다. 이는 지나간 흔적을 담아내는 진과 대비되는 모습으로, 과거의 기록을 흔적도 없이 지울 수 있는 웹만의 특성을 보여준다.",
-  "  웹은 지금 이 순간, 현재를 보여준다. 그렇다면 과거를 저장하는 데 있어 웹은 진보다 못한 매체인 것일까? 결코 그렇지 않다. 웹은 종이와 다른 방식으로 정보를 기록하는 것뿐이다. 종이가 순간을 저장한다면 웹은 상태를 저장한다. 세계 최초의 웹사이트인 World Wide Web을 떠올려 보자. 30년도 넘은 웹사이트지만 전혀 낡지 않았다. 마지막으로 편집되었을 때의 상태를 유지하고 있기 때문이다. 즉 웹은 지나간 순간들을 축적할 수는 없어도, 과거의 상태를 유지하는 데는 특화되어 있다. 그리고 언제나, 가장 최신의 상태로 갱신될 준비가 되어 있다. \n  또한 무언가 새로워졌다는 것을 알아차리려면 바뀌기 전의 모습을 함께 기억하고 있어야 한다. 그렇다면 웹의 갱신은 웹 고유의 방법으로 과거를 환기시키는 것이라고 볼 수 있는 것이 아닐까. 갱신됨으로써 남는 시간의 흔적이, 분명 있을 것이다."
-
+  "  이 웹사이트는 갱신을 테마로 한다. 우리는 갱신을 특징으로 하는 웹의 형태 중 위키를 선택했다. 이유는 간단하다. 누구나 위키를 알고 있기 때문이다. 편집을 해본 적은 없더라도, 위키에 있는 정보를 마주한 경험은 누구나 있을 것이다. 그리고 위키 문서를 보다가 저번에 봤을 때와 내용이 조금 달라진 것을 눈치챈 적이 있는 사람도 분명 많을 것이다. 갱신되었음을 체감하는 순간이다. \n\n '경험하는 시간' 탭은 간단히 설명하면 체험 화면이다. '경험하는 시간'에서 관객은 위키 문서의 글을 자유롭게 수정할 수 있다. 내용을 추가할 수도 있고, 완전히 다른 내용으로 덮어씌울 수도 있다. 그것만으로도 이미 갱신을 경험할 수 있지만, 이 웹은 거기서 한 발짝 더 나아간다. 우측 패널에 방금 수정된 문장만을 띄우는 것이다. 가장 최근의 기록만을 보여주는 우측 패널은 끊임없이 갱신되는 웹의 현재성을 강조한다. 이는 지나간 흔적을 담아내는 진과 대비되는 모습으로, 과거의 기록을 흔적도 없이 지울 수 있는 웹만의 특성을 보여준다.",
+  "  웹은 지금 이 순간, 현재를 보여준다. 그렇다면 과거를 저장하는 데 있어 웹은 진보다 못한 매체인 것일까? 결코 그렇지 않다. 웹은 종이와 다른 방식으로 정보를 기록하는 것뿐이다. 종이가 순간을 저장한다면 웹은 상태를 저장한다. 세계 최초의 웹사이트인 World Wide Web을 떠올려 보자. 30년도 넘은 웹사이트지만 전혀 낡지 않았다. 마지막으로 편집되었을 때의 상태를 유지하고 있기 때문이다. 즉 웹은 지나간 순간들을 축적할 수는 없어도, 과거의 상태를 유지하는 데는 특화되어 있다. 그리고 언제나, 가장 최신의 상태로 갱신될 준비가 되어 있다. \n\n 또한 무언가 새로워졌다는 것을 알아차리려면 바뀌기 전의 모습을 함께 기억하고 있어야 한다. 그렇다면 웹의 갱신은 웹 고유의 방법으로 과거를 환기시키는 것이라고 볼 수 있는 것이 아닐까. 갱신됨으로써 남는 시간의 흔적이, 분명 있을 것이다."
 ];
 const explainIntroCount = 1;
 const scrambleChars = 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ#%&*';
@@ -76,39 +75,59 @@ explainParagraphs.forEach((paragraph, pIndex) => {
   h2.textContent = explainHeadings[pIndex] || '';
   page.appendChild(h2);
 
-  const body = document.createElement('div');
-  body.className = 'explain-body';
-
-  if (pIndex < explainIntroCount) {
-    const words = paragraph.split(' ');
-    words.forEach((word, i) => {
-      if (word.includes('\n') || word.includes('<br>')) {
-        const parts = word.split(/\n|<br>/);
-        parts.forEach((part, idx) => {
-          if (idx > 0) body.appendChild(document.createElement('br'));
-          if (part) {
-            const span = document.createElement('span');
-            span.className = 'word';
-            span.textContent = part;
-            span.dataset.original = part;
-            body.appendChild(span);
-            attachScramble(span);
-          }
-        });
-      } else {
-        const span = document.createElement('span');
-        span.className = 'word';
-        span.textContent = word;
-        span.dataset.original = word;
-        body.appendChild(span);
-        attachScramble(span);
-      }
-      if (i < words.length - 1) body.appendChild(document.createTextNode(' '));
+  if (pIndex === 5 || pIndex === 6) {
+    // 2단 조판: \n\n(또는 \n) 기준으로 나눈 문단을 왼쪽/오른쪽 칸에 하나씩 배정
+    const chunks = paragraph.split(/\n+/).map(c => c.trim()).filter(Boolean);
+    const wrap = document.createElement('div');
+    wrap.className = 'explain-columns-wrap';
+    const col1 = document.createElement('div');
+    col1.className = 'explain-col';
+    const col2 = document.createElement('div');
+    col2.className = 'explain-col';
+    chunks.forEach((chunk, i) => {
+      const p = document.createElement('p');
+      p.textContent = chunk;
+      (i % 2 === 0 ? col1 : col2).appendChild(p);
     });
+    wrap.appendChild(col1);
+    wrap.appendChild(col2);
+    page.appendChild(wrap);
   } else {
-    body.textContent = paragraph;
+    const body = document.createElement('div');
+    body.className = 'explain-body';
+
+    if (pIndex < explainIntroCount) {
+      const words = paragraph.split(' ');
+      words.forEach((word, i) => {
+        if (word.includes('\n') || word.includes('<br>')) {
+          const parts = word.split(/\n|<br>/);
+          parts.forEach((part, idx) => {
+            if (idx > 0) body.appendChild(document.createElement('br'));
+            if (part) {
+              const span = document.createElement('span');
+              span.className = 'word';
+              span.textContent = part;
+              span.dataset.original = part;
+              body.appendChild(span);
+              attachScramble(span);
+            }
+          });
+        } else {
+          const span = document.createElement('span');
+          span.className = 'word';
+          span.textContent = word;
+          span.dataset.original = word;
+          body.appendChild(span);
+          attachScramble(span);
+        }
+        if (i < words.length - 1) body.appendChild(document.createTextNode(' '));
+      });
+    } else {
+      body.textContent = paragraph;
+    }
+    page.appendChild(body);
   }
-  page.appendChild(body);
+
   explainScroll.appendChild(page);
 });
 
@@ -148,6 +167,95 @@ const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('revealed'); });
 }, { threshold: 0.4 });
 explainPages.forEach(page => revealObserver.observe(page));
+
+// 3번째 페이지(새로고침 예시) 도착 시 진짜 새로고침 + 그 페이지로 복귀 + 문장 추가
+const refreshDemoPage = explainPages[2];
+if (refreshDemoPage) {
+  const body = refreshDemoPage.querySelector('.explain-body');
+  const original = body.textContent;
+  const target = '새로고침';
+  const idx = original.indexOf(target);
+  if (idx !== -1) {
+    body.innerHTML = '';
+    body.appendChild(document.createTextNode(original.slice(0, idx)));
+    const link = document.createElement('span');
+    link.className = 'clickable-word';
+    link.textContent = target;
+    link.addEventListener('click', () => {
+      sessionStorage.setItem('reloadTarget', 'explain-2');
+      location.reload();
+    });
+    body.appendChild(link);
+    body.appendChild(document.createTextNode(original.slice(idx + target.length)));
+  }
+}
+// 새로고침 이후, 원래 있던 자리(설명 화면 3번째 페이지)로 자동 복귀
+if (sessionStorage.getItem('reloadTarget') === 'explain-2') {
+  sessionStorage.removeItem('reloadTarget');
+  goTo('explain');
+  const targetPage = explainPages[2];
+  if (targetPage) {
+    explainScroll.scrollTop = targetPage.offsetTop;
+    const body = targetPage.querySelector('.explain-body');
+    body.textContent += '\n\n  바로 방금 전처럼 말이다.';
+  }
+}
+
+function typewriterOverwrite(el, oldText, newText, speed = 18) {
+  const len = Math.max(oldText.length, newText.length);
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i >= len) {
+      clearInterval(interval);
+      el.textContent = newText;
+      return;
+    }
+    el.textContent = newText.slice(0, i + 1) + oldText.slice(i + 1);
+    i++;
+  }, speed);
+}
+
+const overwriteReplacementText = "  방금 이 글은 덮어쓰기 되었다. 순식간에 벌어진 일이다. 당신은 덮어씌워지기 전의 텍스트를 기억하는가?";
+const overwritePage = explainPages[3];
+if (overwritePage) {
+  const body = overwritePage.querySelector('.explain-body');
+  const original = body.textContent;
+  const target = '덮어쓰기';
+  const idx = original.indexOf(target);
+  if (idx !== -1) {
+    body.innerHTML = '';
+    body.appendChild(document.createTextNode(original.slice(0, idx)));
+    const link = document.createElement('span');
+    link.className = 'clickable-word';
+    link.textContent = target;
+    link.addEventListener('click', () => {
+      typewriterOverwrite(body, body.textContent, overwriteReplacementText);
+    });
+    body.appendChild(link);
+    body.appendChild(document.createTextNode(original.slice(idx + target.length)));
+  }
+}
+
+// '404 error' 클릭 시 가짜 404 화면 오버레이 (5번째 페이지)
+const errorPage = explainPages[4];
+if (errorPage) {
+  const body = errorPage.querySelector('.explain-body');
+  const original = body.textContent;
+  const target = '404 error';
+  const idx = original.indexOf(target);
+  if (idx !== -1) {
+    body.innerHTML = '';
+    body.appendChild(document.createTextNode(original.slice(0, idx)));
+    const link = document.createElement('span');
+    link.className = 'clickable-word';
+    link.textContent = target;
+    link.addEventListener('click', () => {
+  window.open('https://yewonjang1717.github.io/renewal_time/this-page-does-not-exist', '_blank');
+});
+    body.appendChild(link);
+    body.appendChild(document.createTextNode(original.slice(idx + target.length)));
+  }
+}
 
 // ---------- 체험 화면: 좌우 패널 hover 확대 ----------
 const panelLeft = document.getElementById('panel-left');
@@ -357,7 +465,6 @@ function ensureTableRemoveButton(table) {
   wrap.insertBefore(addRowBtn, table);
   wrap.insertBefore(removeBtn, table);
 }
-    leftBody.querySelectorAll('p:not(.wiki-notice), .heading-text').forEach(el => el.setAttribute('contenteditable', 'true'));
 
 function getCurrentBlockElement() {
   const sel = window.getSelection();
@@ -482,18 +589,23 @@ editBtn.addEventListener('click', () => {
   if (!isEditing) {
     isEditing = true;
     leftBody.classList.add('is-editing');
-    document.getElementById('edit-guide-overlay').classList.add('show');
+    const guideP = document.createElement('p');
+guideP.className = 'wiki-edit-guide';
+guideP.id = 'wiki-edit-guide';
+guideP.innerHTML = '대분류: <code>=내용=</code> → 1, 2, 3 ...<br>하위항목: <code>-내용-</code> → 1.1, 1.2 ...';
+document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP);
     editBtn.textContent = '완료';
     editBtn.classList.add('done');
     addTableBtn.style.display = 'inline-block';
     leftTitle.setAttribute('contenteditable', 'true');
-        leftBody.querySelectorAll('p:not(.wiki-notice), .heading-text').forEach(el => el.removeAttribute('contenteditable'));
+        leftBody.querySelectorAll('p:not(.wiki-notice), .heading-text').forEach(el => el.setAttribute('contenteditable', 'true'));
     leftBody.querySelectorAll('td:not(.row-controls)').forEach(td => td.setAttribute('contenteditable', 'true'));
     leftBody.setAttribute('contenteditable', 'true');
     previousBlocks = extractBlocks(leftBody);
     leftTitle.focus();
   } else {
     isEditing = false;
+     document.getElementById('wiki-edit-guide')?.remove();
     leftBody.classList.remove('is-editing');
     editBtn.textContent = '편집';
     editBtn.classList.remove('done');
@@ -577,8 +689,4 @@ editBtn.addEventListener('click', () => {
 
     previousBlocks = currentBlocks;
   }
-});
-
-document.getElementById('edit-guide-confirm-btn').addEventListener('click', () => {
-  document.getElementById('edit-guide-overlay').classList.remove('show');
 });

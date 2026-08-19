@@ -11,7 +11,7 @@
 
 body {
   font-family: 'sandoll-gothicneo1', 'sans-serif';
-  font-weight: 200;
+  font-weight: 400;
   font-style: normal;
 }
 
@@ -23,7 +23,7 @@ html, body {
   background: var(--bg);
   color: var(--light-text);
   font-family: 'sandoll-gothicneo1', 'sans-serif';
-  font-weight: 200;
+  font-weight: 400;
   font-style: normal;
   overflow: hidden;
 }
@@ -31,15 +31,10 @@ html, body {
 .screen {
   position: absolute;
   inset: 0;
-  opacity: 0;
-  transform: scale(0.96);
-  pointer-events: none;
-  transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.5s cubic-bezier(0.4,0,0.2,1);
+  display: none;
 }
 .screen.active {
-  opacity: 1;
-  transform: scale(1);
-  pointer-events: auto;
+  display: block;
 }
 
 /* ---------- 메인 화면 ---------- */
@@ -101,17 +96,8 @@ html, body {
 .tab-btn.active {
   color: var(--light-text);
   font-weight: 700;
-}.tab-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 64px;
-  display: flex;
-  border-top: 3px solid #3a3a3a;
-  background: var(--bg);
-  z-index: 20;
 }
+
 .tab-btn {
   flex: 1;
   background: none;
@@ -370,7 +356,6 @@ html, body {
   font-size: 15px;
   padding: 36px 44px;
   border-radius: 8px;
-  box-shadow: 0 10px 34px rgba(0,0,0,0.45);
 }
 .intro-hint p {
   margin: 0 0 20px 0;
@@ -378,35 +363,27 @@ html, body {
 }
 .intro-confirm-btn {
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
   background: none;
-  border: 1px solid #2c2c2c;
-  color: #2c2c2c;
-  border-radius: 8px;
-  padding: 8px 24px;
+  border: none;
+  color: #3366cc;
+  padding: 0;
   cursor: pointer;
+}
+.intro-confirm-btn:hover {
+  text-decoration: underline;
 }
 .intro-confirm-btn:hover {
   background: rgba(0,0,0,0.06);
 }
-.edit-guide-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 40;
-  opacity: 0;
-  pointer-events: none;
-  border-radius: 8px;
-  transition: opacity 0.3s ease;
+.wiki-edit-guide {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--panel-muted);
+  line-height: 1.9;
+  margin: 12px 0 0 0;
 }
-.edit-guide-overlay.show {
-  opacity: 1;
-  pointer-events: auto;
-  background: rgba(0,0,0,0.15);
-}
-.edit-guide-overlay .intro-hint code {
+.wiki-edit-guide code {
   background: rgba(0,0,0,0.06);
   padding: 1px 5px;
   border-radius: 4px;
@@ -449,4 +426,28 @@ html, body {
   color: var(--panel-text);
   line-height: 1.9;
   margin: 8px 0 0 0;
+}
+.clickable-word {
+  text-decoration: underline;
+  cursor: pointer;
+  transition: font-weight 0.1s ease;
+}
+.clickable-word:hover {
+  font-weight: 700;
+}
+.explain-columns-wrap {
+  display: flex;
+  gap: 56px;
+  max-width: 1000px;
+  margin-left: auto;
+}
+.explain-col {
+  flex: 1;
+  font-size: 20px;
+  line-height: 1.9;
+  color: var(--light-text);
+  word-break: keep-all;
+}
+.explain-col p {
+  margin: 0 0 20px 0;
 }
