@@ -579,14 +579,15 @@ function loadState() {
 loadState();
 let previousBlocks = extractBlocks(leftBody);
 
-function renderRightBody(blocks) {
+function renderRightBody(blocks, animatingInit) {
+  animatingInit = animatingInit || new Map();
   rightBody.innerHTML = '';
   blocks.forEach(block => {
-       if (block.type === 'heading1' || block.type === 'heading2') {
+    if (block.type === 'heading1' || block.type === 'heading2') {
       const headingDiv = makeHeadingDiv(block.text, block.type === 'heading1' ? 1 : 2);
       if (!revealedStructuralIds.has(block.id)) headingDiv.classList.add('hidden');
       rightBody.appendChild(headingDiv);
-       } else if (block.type === 'paragraph') {
+    } else if (block.type === 'paragraph') {
       const p = document.createElement('p');
       p.dataset.blockId = block.id;
       block.sentences.forEach((s, i) => {
@@ -594,23 +595,11 @@ function renderRightBody(blocks) {
         const span = document.createElement('span');
         span.className = 'sentence' + (revealedMap.has(key) ? '' : ' hidden');
         span.dataset.key = key;
-        span.textContent = s;
+        span.textContent = animatingInit.has(key) ? animatingInit.get(key) : s;
         p.appendChild(span);
         p.appendChild(document.createTextNode(' '));
       });
       rightBody.appendChild(p);
-    } else if (block.type === 'table') {
-      const wrap = document.createElement('div');
-      wrap.className = 'table-block' + (revealedStructuralIds.has(block.id) ? '' : ' hidden');
-      const table = document.createElement('table');
-      table.className = 'wiki-table';
-      block.rows.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td class="label">${row.label}</td><td>${row.value}</td>`;
-        table.appendChild(tr);
-      });
-      wrap.appendChild(table);
-      rightBody.appendChild(wrap);
     }
   });
   renumberHeadings(rightBody);
@@ -714,7 +703,8 @@ const deletedSentences = [];
           if (anyChange) {
   const touchedThisTurn = new Set(sentenceAnimations.map(a => a.key));
   evictUntouched(touchedThisTurn); // 이번 턴 이전에 남아있던 것들을 먼저 정리
-  renderRightBody(currentBlocks);
+  const animatingInit = new Map(sentenceAnimations.map(a => [a.key, a.oldDisplayed]));
+  renderRightBody(currentBlocks, animatingInit);
   refreshFlash(document.getElementById('flash-right'));
   version += 0.1;
   rightVersion.textContent = 'ver. ' + version.toFixed(1);
