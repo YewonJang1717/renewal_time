@@ -10,9 +10,10 @@ function goTo(name) {
   screens[name].classList.add('active');
   updateActiveTab(name);
 
-  if (name === 'explain') {
+      if (name === 'explain') {
     document.getElementById('explain-scroll').scrollTop = 0;
     playIntroHeadingAnimation();
+    replayAllPageAnimations();
     const toast = document.getElementById('scroll-toast');
     toast.classList.add('show');
     clearTimeout(goTo._toastTimer);
@@ -75,26 +76,24 @@ explainParagraphs.forEach((paragraph, pIndex) => {
   h2.textContent = explainHeadings[pIndex] || '';
   page.appendChild(h2);
 
-  if (pIndex === 5 || pIndex === 6) {
-    // 2단 조판: \n\n(또는 \n) 기준으로 나눈 문단을 왼쪽/오른쪽 칸에 하나씩 배정
+    if (pIndex === 5 || pIndex === 6) {
+    // 자유 배치: 일러스트레이터 시안의 흰 박스 위치 그대로, 페이지마다 다른 배치
     const chunks = paragraph.split(/\n+/).filter(c => c.trim().length > 0);
     const wrap = document.createElement('div');
-    wrap.className = 'explain-columns-wrap';
-    const col1 = document.createElement('div');
-    col1.className = 'explain-col';
-    const col2 = document.createElement('div');
-    col2.className = 'explain-col';
-    chunks.forEach((chunk, i) => {
+    wrap.className = 'explain-freeform-wrap ' + (pIndex === 5 ? 'layout-a' : 'layout-b');
+        chunks.forEach((chunk, i) => {
+      const box = document.createElement('div');
+      box.className = 'explain-freeform-box box-' + (i + 1) + ' fade-up-target';
+      if (i === 1) box.style.transitionDelay = '0.25s'; // 오른쪽(2번) 박스가 조금 더 늦게
       const p = document.createElement('p');
       p.textContent = chunk;
-      (i % 2 === 0 ? col1 : col2).appendChild(p);
+      box.appendChild(p);
+      wrap.appendChild(box);
     });
-    wrap.appendChild(col1);
-    wrap.appendChild(col2);
     page.appendChild(wrap);
   } else {
     const body = document.createElement('div');
-    body.className = 'explain-body';
+    body.className = 'explain-body fade-up-target';
 
     if (pIndex < explainIntroCount) {
       const words = paragraph.split(' ');
@@ -156,6 +155,27 @@ function playIntroHeadingAnimation() {
   );
 }
 
+function replayAllPageAnimations() {
+  const pages = document.querySelectorAll('.explain-page');
+  pages.forEach(page => {
+    page.classList.remove('revealed');
+    page.querySelectorAll('.fade-up-target').forEach(el => el.classList.remove('in'));
+  });
+
+  const firstPage = pages[0];
+  if (firstPage) {
+    const targets = firstPage.querySelectorAll('.fade-up-target');
+    targets.forEach(el => { void el.offsetWidth; }); 
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        firstPage.classList.add('revealed');
+        targets.forEach(el => el.classList.add('in'));
+      });
+    });
+  }
+}
+
 const scrollHint = document.getElementById('scroll-hint');
 explainScroll.addEventListener('scroll', () => {
   const nearBottom = explainScroll.scrollTop + explainScroll.clientHeight >= explainScroll.scrollHeight - 10;
@@ -164,7 +184,12 @@ explainScroll.addEventListener('scroll', () => {
 
 const explainPages = document.querySelectorAll('.explain-page');
 const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('revealed'); });
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('revealed');
+      entry.target.querySelectorAll('.fade-up-target').forEach(el => el.classList.add('in'));
+    }
+  });
 }, { threshold: 0.4 });
 explainPages.forEach(page => revealObserver.observe(page));
 
