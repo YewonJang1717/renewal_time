@@ -77,7 +77,7 @@ explainParagraphs.forEach((paragraph, pIndex) => {
 
   if (pIndex === 5 || pIndex === 6) {
     // 2단 조판: \n\n(또는 \n) 기준으로 나눈 문단을 왼쪽/오른쪽 칸에 하나씩 배정
-    const chunks = paragraph.split(/\n+/).map(c => c.trim()).filter(Boolean);
+    const chunks = paragraph.split(/\n+/).filter(c => c.trim().length > 0);
     const wrap = document.createElement('div');
     wrap.className = 'explain-columns-wrap';
     const col1 = document.createElement('div');
@@ -285,7 +285,6 @@ const rightBody = document.getElementById('right-body');
 let isEditing = false;
 let version = 1.0;
 let touchCounter = 0;
-const MAX_REVEALED = 1; // 여기 숫자만 바꾸면 몇 개까지 남길지 조절돼요 (예: 5로 바꾸면 예전 방식)
 
 const revealedMap = new Map();
 const revealedStructuralIds = new Set();
@@ -619,20 +618,15 @@ function renderRightBody(blocks) {
 renderRightBody(previousBlocks);
 renumberHeadings(leftBody);
 
-function evictIfNeeded() {
-  while (revealedMap.size > MAX_REVEALED) {
-    let oldestKey = null, oldestTouch = Infinity;
-    revealedMap.forEach((entry, key) => {
-      if (entry.lastTouched < oldestTouch) { oldestTouch = entry.lastTouched; oldestKey = key; }
-    });
-    if (oldestKey !== null) {
-      revealedMap.delete(oldestKey);
-      const span = rightBody.querySelector(`.sentence[data-key="${oldestKey}"]`);
+function evictUntouched(keepKeys) {
+  Array.from(revealedMap.keys()).forEach(key => {
+    if (!keepKeys.has(key)) {
+      revealedMap.delete(key);
+      const span = rightBody.querySelector(`.sentence[data-key="${key}"]`);
       if (span) { span.classList.add('hidden'); span.classList.remove('diff-removed', 'diff-added'); }
     }
-  }
+  });
 }
-
 editBtn.addEventListener('click', () => {
   if (!isEditing) {
     isEditing = true;
@@ -733,9 +727,10 @@ document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP)
     animateSentenceReplace(ghost, oldDisplayed, '');
   });
 
-  // 애니메이션이 다 끝난 뒤에야 "1개만 남기기" 규칙 적용
+  // 애니메이션이 다 끝난 뒤에야, 이번 턴에 안 바뀐 이전 문장들을 정리
+  const touchedThisTurn = new Set(sentenceAnimations.map(a => a.key));
   setTimeout(() => {
-    evictIfNeeded();
+    evictUntouched(touchedThisTurn);
   }, 1500);
 }
 
