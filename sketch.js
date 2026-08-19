@@ -643,7 +643,9 @@ document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP)
         leftBody.querySelectorAll('p:not(.wiki-notice), .heading-text').forEach(el => el.setAttribute('contenteditable', 'true'));
     leftBody.querySelectorAll('td:not(.row-controls)').forEach(td => td.setAttribute('contenteditable', 'true'));
     leftBody.setAttribute('contenteditable', 'true');
-    previousBlocks = extractBlocks(leftBody);
+        previousBlocks = extractBlocks(leftBody);
+    revealedMap.clear();
+    renderRightBody(previousBlocks);
     leftTitle.focus();
   } else {
     isEditing = false;
@@ -665,11 +667,13 @@ document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP)
     const currentTitle = leftTitle.textContent.trim();
     if (currentTitle !== rightTitle.textContent.trim()) rightTitle.textContent = currentTitle;
 
-        const currentBlocks = extractBlocks(leftBody);
-    const prevById = new Map(previousBlocks.map(b => [b.id, b]));
-    let anyChange = false;
-    const sentenceAnimations = [];
-    const deletedSentences = [];
+       const currentBlocks = extractBlocks(leftBody);
+const prevById = new Map(previousBlocks.map(b => [b.id, b]));
+const previousSentenceTexts = new Set();
+previousBlocks.forEach(b => { if (b.type === 'paragraph') b.sentences.forEach(s => previousSentenceTexts.add(s)); });
+let anyChange = false;
+const sentenceAnimations = [];
+const deletedSentences = [];
 
         currentBlocks.forEach(block => {
       if (block.type !== 'paragraph') {
@@ -688,12 +692,13 @@ document.querySelector('.wiki-notice').insertAdjacentElement('afterend', guideP)
                 for (let i = 0; i < maxLen; i++) {
         const oldS = oldSentences[i] || '';
         const newS = block.sentences[i] || '';
-        if (oldS === newS) continue;
-        anyChange = true;
-        const key = block.id + '-' + i;
-        const previouslyDisplayed = revealedMap.has(key) ? revealedMap.get(key).text : oldS;
+            if (oldS === newS) continue;
+    if (newS && previousSentenceTexts.has(newS)) continue; // 쪼개짐으로 인한 가짜 "새 문장" 무시
+    anyChange = true;
+    const key = block.id + '-' + i;
+    const previouslyDisplayed = revealedMap.has(key) ? revealedMap.get(key).text : oldS;
 
-        if (newS) {
+    if (newS) {
           sentenceAnimations.push({ key, oldDisplayed: previouslyDisplayed, newText: newS });
           touchCounter++;
           revealedMap.set(key, { text: newS, lastTouched: touchCounter });
