@@ -31,12 +31,13 @@ html, body {
 .screen {
   position: absolute;
   inset: 0;
-  display: none;
+  opacity: 0;
+  pointer-events: none;
 }
 .screen.active {
-  display: block;
+  opacity: 1;
+  pointer-events: auto;
 }
-
 /* ---------- 메인 화면 ---------- */
 #screen-main {
   display: flex;
