@@ -668,7 +668,7 @@ function renderDiffAndAnimate(oldBlocks, newBlocks, opts) {
     rightVersion.textContent = 'ver. ' + version.toFixed(1);
   }
 
-  animations.forEach(({ span, oldText, newText }) => {
+   animations.forEach(({ span, oldText, newText }) => {
     span.classList.remove('hidden');
     animateSentenceReplace(span, oldText, newText);
   });
@@ -677,8 +677,13 @@ function renderDiffAndAnimate(oldBlocks, newBlocks, opts) {
     animateSentenceReplace(span, text, '');
     setTimeout(() => { span.remove(); }, 1600);
   });
-}
 
+  // 방금 바뀐 부분으로 오른쪽 패널을 자동 스크롤
+  const firstTarget = (animations[0] && animations[0].span) || (removals[0] && removals[0].span);
+  if (firstTarget) {
+    firstTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
 // ---------- 저장/불러오기 (이제 순수 텍스트/HTML만 저장하면 충분해요) ----------
 const STORAGE_KEY = 'renewalTimeWikiState';
 

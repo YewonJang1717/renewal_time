@@ -391,8 +391,10 @@ html, body {
   font-family: inherit;
 }
 .sentence {
-  color: var(--panel-right);
+  color: var(--panel-text);
   transition: color 0.4s ease;
+}
+#panel-right {
   user-select: none;
 }
 .sentence.hidden {
