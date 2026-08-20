@@ -11,7 +11,7 @@
 
 body {
   font-family: 'sandoll-gothicneo1', 'sans-serif';
-  font-weight: 400;
+  font-weight: 700;
   font-style: normal;
 }
 
@@ -23,7 +23,7 @@ html, body {
   background: var(--bg);
   color: var(--light-text);
   font-family: 'sandoll-gothicneo1', 'sans-serif';
-  font-weight: 400;
+  font-weight: 700;
   font-style: normal;
   overflow: hidden;
 }
