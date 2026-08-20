@@ -10,8 +10,8 @@
 }
 
 body {
-  font-family: 'sandoll-gothicneo1', 'sans-serif';
-  font-weight: 700;
+  font-family: 'Apple SD Gothic Neo', 'sans-serif';
+  font-weight: 400;
   font-style: normal;
 }
 
@@ -22,8 +22,8 @@ html, body {
   height: 100%;
   background: var(--bg);
   color: var(--light-text);
-  font-family: 'sandoll-gothicneo1', 'sans-serif';
-  font-weight: 700;
+  font-family: 'Apple SD Gothic Neo', 'sans-serif';
+  font-weight: 400;
   font-style: normal;
   overflow: hidden;
 }
@@ -64,7 +64,7 @@ html, body {
   border: none;
   color: var(--light-muted);
   font-size: 21px;
-  font-family: 'sandoll-gothicneo1', 'sans-serif';
+  font-family: 'Apple SD Gothic Neo', 'sans-serif';
   cursor: pointer;
   padding: 4px 8px;
   transition: color 0.2s ease;
@@ -89,7 +89,7 @@ html, body {
   background: none;
   border: none;
   color: var(--light-muted);
-  font-family: inherit;
+  font-family: 'Apple SD Gothic Neo', 'sans-serif';
   font-size: 14px;
   cursor: pointer;
 }
@@ -103,7 +103,7 @@ html, body {
   background: none;
   border: none;
   color: var(--light-muted);
-  font-family: inherit;
+  font-family: 'Apple SD Gothic Neo', 'sans-serif';
   font-size: 14px;
   cursor: pointer;
 }
