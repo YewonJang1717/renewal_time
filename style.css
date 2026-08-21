@@ -226,12 +226,12 @@ html, body {
   white-space: nowrap;
 }
 .wiki-meta {
-  font-size: 12px;
+  font-size: 16px;
   color: var(--panel-muted);
 }
 .edit-btn {
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
   border: none;
   background: none;
   color: #3366cc;
@@ -246,14 +246,14 @@ html, body {
 .wiki-body p { margin: 0 0 16px 0; }
 
 .wiki-subheading {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
   margin: 28px 0 10px 0;
   border-bottom: 1px solid #c9cbd0;
   padding-bottom: 8px;
 }
 .wiki-subheading2 {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
   margin: 20px 0 8px 20px;
   border-bottom: none;
@@ -274,7 +274,7 @@ html, body {
   border-collapse: collapse;
   margin-top: 12px;
   margin-bottom: 24px;
-  font-size: 13px;
+  font-size: 16px;
 }
 .wiki-table td {
   border: 1px solid #c9cbd0;
@@ -291,7 +291,7 @@ html, body {
 .table-remove-btn, .row-add-btn {
   display: none;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
   color: #3366cc;
   background: none;
   border: none;
@@ -332,51 +332,9 @@ html, body {
   transform: translateX(-50%) translateY(0);
 }
 
-/* 체험 화면 첫 안내 배너 */
-.intro-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 40;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-.intro-overlay.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-.intro-hint {
-  text-align: center;
-  background: #fafaf8;
-  color: #2c2c2c;
-  font-size: 15px;
-  padding: 36px 44px;
-  border-radius: 8px;
-}
-.intro-hint p {
-  margin: 0 0 20px 0;
-  color: #2c2c2c;
-}
-.intro-confirm-btn {
-  font-family: inherit;
-  font-size: 14px;
-  background: none;
-  border: none;
-  color: #3366cc;
-  padding: 0;
-  cursor: pointer;
-}
-.intro-confirm-btn:hover {
-  text-decoration: underline;
-}
-.intro-confirm-btn:hover {
-  background: rgba(0,0,0,0.06);
-}
+
 .wiki-edit-guide {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--panel-muted);
   line-height: 1.9;
@@ -423,7 +381,7 @@ html, body {
   z-index: 5;
 }
 .wiki-notice {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--panel-text);
   line-height: 1.9;
