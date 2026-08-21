@@ -13,7 +13,7 @@ function goTo(name) {
          if (name === 'explain') {
     document.getElementById('explain-scroll').scrollTop = 0;
     playIntroHeadingAnimation();
-    replayAllPageAnimations();
+    playFirstPageFade();
     setupClickableWord(2, '새로고침', () => {
       sessionStorage.setItem('reloadTarget', 'explain-2');
       location.reload();
@@ -243,14 +243,12 @@ function typewriterOverwrite(el, oldText, newText, speed = 18) {
 
 const overwriteReplacementText = " 방금 이 글은 덮어쓰기 되었다. 순식간에 벌어진 일이다. 당신은 덮어씌워지기 전의 텍스트를 기억하는가?";
 
-// 새로고침 이후, 원래 있던 자리(설명 화면 3번째 페이지)로 자동 복귀
-// (여기 위치는 파일에서 필요한 값들이 전부 정의된 다음이어야 해요)
 if (sessionStorage.getItem('reloadTarget') === 'explain-2') {
   sessionStorage.removeItem('reloadTarget');
   goTo('explain');
   const targetPage = explainPages[2];
   if (targetPage) {
-    explainScroll.scrollTop = targetPage.offsetTop;
+    targetPage.scrollIntoView({ block: 'start' });
     const body = targetPage.querySelector('.explain-body');
     body.textContent += '\n\n  바로 방금 전처럼 말이다.';
   }

@@ -152,6 +152,7 @@ html, body {
   color: var(--light-text);
   word-break: keep-all;
   text-align: justify;
+  white-space: pre-wrap;
 }
 .explain-body span.word {
   display: inline-block;
