@@ -10,10 +10,21 @@ function goTo(name) {
   screens[name].classList.add('active');
   updateActiveTab(name);
 
-       if (name === 'explain') {
+         if (name === 'explain') {
     document.getElementById('explain-scroll').scrollTop = 0;
     playIntroHeadingAnimation();
-    playFirstPageFade();
+    replayAllPageAnimations();
+    setupClickableWord(2, '새로고침', () => {
+      sessionStorage.setItem('reloadTarget', 'explain-2');
+      location.reload();
+    });
+    setupClickableWord(3, '덮어쓰기', () => {
+      const body = explainPages[3].querySelector('.explain-body');
+      typewriterOverwrite(body, body.textContent, overwriteReplacementText);
+    });
+    setupClickableWord(4, '404 error', () => {
+      window.open('https://yewonjang1717.github.io/renewal_time/this-page-does-not-exist', '_blank');
+    });
     const toast = document.getElementById('scroll-toast');
     toast.classList.add('show');
     clearTimeout(goTo._toastTimer);
@@ -190,37 +201,31 @@ function playFirstPageFade() {
 }
 
 // 3번째 페이지(새로고침 예시) 도착 시 진짜 새로고침 + 그 페이지로 복귀 + 문장 추가
-const refreshDemoPage = explainPages[2];
-if (refreshDemoPage) {
-  const body = refreshDemoPage.querySelector('.explain-body');
-  const original = body.textContent;
-  const target = '새로고침';
+// 특정 페이지의 특정 단어를 클릭 가능하게 만드는 공통 함수 (원본 텍스트로 항상 리셋)
+function setupClickableWord(pageIdx, target, onClick) {
+  const page = explainPages[pageIdx];
+  if (!page) return;
+  const body = page.querySelector('.explain-body');
+  if (!body) return;
+  const original = explainParagraphs[pageIdx];
   const idx = original.indexOf(target);
-  if (idx !== -1) {
-    body.innerHTML = '';
-    body.appendChild(document.createTextNode(original.slice(0, idx)));
-    const link = document.createElement('span');
-    link.className = 'clickable-word';
-    link.textContent = target;
-    link.addEventListener('click', () => {
-      sessionStorage.setItem('reloadTarget', 'explain-2');
-      location.reload();
-    });
-    body.appendChild(link);
-    body.appendChild(document.createTextNode(original.slice(idx + target.length)));
-  }
+  if (idx === -1) { body.textContent = original; return; }
+  body.innerHTML = '';
+  body.appendChild(document.createTextNode(original.slice(0, idx)));
+  const link = document.createElement('span');
+  link.className = 'clickable-word';
+  link.textContent = target;
+  link.addEventListener('click', onClick);
+  body.appendChild(link);
+  body.appendChild(document.createTextNode(original.slice(idx + target.length)));
 }
-// 새로고침 이후, 원래 있던 자리(설명 화면 3번째 페이지)로 자동 복귀
-if (sessionStorage.getItem('reloadTarget') === 'explain-2') {
-  sessionStorage.removeItem('reloadTarget');
-  goTo('explain');
-  const targetPage = explainPages[2];
-  if (targetPage) {
-    explainScroll.scrollTop = targetPage.offsetTop;
-    const body = targetPage.querySelector('.explain-body');
-    body.textContent += '\n\n  바로 방금 전처럼 말이다.';
-  }
-}
+
+setupClickableWord(2, '새로고침', () => {
+  sessionStorage.setItem('reloadTarget', 'explain-2');
+  location.reload();
+});
+
+
 
 function typewriterOverwrite(el, oldText, newText, speed = 18) {
   const len = Math.max(oldText.length, newText.length);
@@ -236,45 +241,18 @@ function typewriterOverwrite(el, oldText, newText, speed = 18) {
   }, speed);
 }
 
-const overwriteReplacementText = "  방금 이 글은 덮어쓰기 되었다. 순식간에 벌어진 일이다. 당신은 덮어씌워지기 전의 텍스트를 기억하는가?";
-const overwritePage = explainPages[3];
-if (overwritePage) {
-  const body = overwritePage.querySelector('.explain-body');
-  const original = body.textContent;
-  const target = '덮어쓰기';
-  const idx = original.indexOf(target);
-  if (idx !== -1) {
-    body.innerHTML = '';
-    body.appendChild(document.createTextNode(original.slice(0, idx)));
-    const link = document.createElement('span');
-    link.className = 'clickable-word';
-    link.textContent = target;
-    link.addEventListener('click', () => {
-      typewriterOverwrite(body, body.textContent, overwriteReplacementText);
-    });
-    body.appendChild(link);
-    body.appendChild(document.createTextNode(original.slice(idx + target.length)));
-  }
-}
+const overwriteReplacementText = " 방금 이 글은 덮어쓰기 되었다. 순식간에 벌어진 일이다. 당신은 덮어씌워지기 전의 텍스트를 기억하는가?";
 
-// '404 error' 클릭 시 가짜 404 화면 오버레이 (5번째 페이지)
-const errorPage = explainPages[4];
-if (errorPage) {
-  const body = errorPage.querySelector('.explain-body');
-  const original = body.textContent;
-  const target = '404 error';
-  const idx = original.indexOf(target);
-  if (idx !== -1) {
-    body.innerHTML = '';
-    body.appendChild(document.createTextNode(original.slice(0, idx)));
-    const link = document.createElement('span');
-    link.className = 'clickable-word';
-    link.textContent = target;
-    link.addEventListener('click', () => {
-  window.open('https://yewonjang1717.github.io/renewal_time/this-page-does-not-exist', '_blank');
-});
-    body.appendChild(link);
-    body.appendChild(document.createTextNode(original.slice(idx + target.length)));
+// 새로고침 이후, 원래 있던 자리(설명 화면 3번째 페이지)로 자동 복귀
+// (여기 위치는 파일에서 필요한 값들이 전부 정의된 다음이어야 해요)
+if (sessionStorage.getItem('reloadTarget') === 'explain-2') {
+  sessionStorage.removeItem('reloadTarget');
+  goTo('explain');
+  const targetPage = explainPages[2];
+  if (targetPage) {
+    explainScroll.scrollTop = targetPage.offsetTop;
+    const body = targetPage.querySelector('.explain-body');
+    body.textContent += '\n\n  바로 방금 전처럼 말이다.';
   }
 }
 

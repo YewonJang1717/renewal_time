@@ -58,16 +58,21 @@ html, body {
   flex-direction: column;
   gap: 14px;
   align-items: center;
+  margin-top: 24px;
 }
 .main-nav button {
   background: none;
   border: none;
   color: var(--light-muted);
-  font-size: 21px;
-  font-family: 'Apple SD Gothic Neo', 'sans-serif';
+  font-size: 24px;
+  font-family: inherit;
   cursor: pointer;
   padding: 4px 8px;
+  font-weight: 500;
   transition: color 0.2s ease;
+}
+.main-nav button:first-child {
+  margin-top: -16px;
 }
 .main-nav button:hover {
   color: var(--light-text);
@@ -84,15 +89,7 @@ html, body {
   background: var(--bg);
   z-index: 20;
 }
-.tab-btn {
-  flex: 1;
-  background: none;
-  border: none;
-  color: var(--light-muted);
-  font-family: 'Apple SD Gothic Neo', 'sans-serif';
-  font-size: 14px;
-  cursor: pointer;
-}
+
 .tab-btn.active {
   color: var(--light-text);
   font-weight: 700;
@@ -104,7 +101,7 @@ html, body {
   border: none;
   color: var(--light-muted);
   font-family: 'Apple SD Gothic Neo', 'sans-serif';
-  font-size: 14px;
+  font-size: 17px;
   cursor: pointer;
 }
 .tab-btn.active {
@@ -243,7 +240,7 @@ html, body {
 .edit-btn:hover { text-decoration: underline; }
 .edit-btn.done { color: #3366cc; }
 
-.wiki-body { font-size: 14px; line-height: 1.9; outline: none; }
+.wiki-body { font-size: 16px; line-height: 1.9; outline: none; }
 .wiki-body[contenteditable="true"] { background: rgba(0,0,0,0.02); }
 .wiki-body p { margin: 0 0 16px 0; }
 
@@ -455,11 +452,10 @@ html, body {
 }
 
 /* 첫 번째 이미지 ("갱신되는 시간") 배치 */
-.layout-a .box-1 { left: 30%; top: 8%; width: 33%; }
+.layout-a .box-1 { left: 38%; top: 12%; width: 33%; }
 .layout-a .box-2 { left: 60%; top: 44%; width: 34%; }
 
-/* 두 번째 이미지 ("끝맺는 말") 배치 */
-.layout-b .box-1 { left: 26%; top: 13%; width: 33%; }
+.layout-b .box-1 { left: 34%; top: 12%; width: 33%; }
 .layout-b .box-2 { left: 62%; top: 57%; width: 30%; }
 .explain-col p {
   margin: 0 0 20px 0;
