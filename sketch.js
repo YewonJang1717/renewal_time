@@ -260,6 +260,7 @@ const panelRight = document.getElementById('panel-right');
 const experienceStage = document.getElementById('screen-experience');
 
 function setActivePanel(activePanel) {
+  if (isEditing) activePanel = panelLeft; // 편집 중엔 무조건 왼쪽이 큰 상태로 고정
   [panelLeft, panelRight].forEach(p => { p.classList.remove('grow'); p.classList.remove('shrink'); });
   if (activePanel) {
     activePanel.classList.add('grow');
@@ -723,8 +724,9 @@ let previousBlocks = snapshotBlocks(leftBody);
 renderDiffAndAnimate(previousBlocks, previousBlocks, { silent: true }); // 초기 상태: 전부 배경색
 
 editBtn.addEventListener('click', () => {
-  if (!isEditing) {
-    isEditing = true;
+   if (!isEditing) {
+        isEditing = true;
+    setActivePanel(panelLeft); // 편집 시작하는 순간 왼쪽이 큰 상태로 고정
     leftBody.classList.add('is-editing');
     const guideP = document.createElement('p');
     guideP.className = 'wiki-edit-guide';
